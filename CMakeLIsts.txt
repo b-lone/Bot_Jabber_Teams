@@ -1,0 +1,26 @@
+cmake_minimum_required(VERSION 3.14)
+
+project(Bot)
+
+set(PROJECT_ROOT_PATH "${CMAKE_SOURCE_DIR}")
+set(PROJECT_OUTPUT_PARH "${PROJECT_ROOT_PATH}/bin")
+set(PROJECT_SRC_PATH "${PROJECT_ROOT_PATH}/src")
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+
+find_package(Qt5 COMPONENTS Widgets REQUIRED)
+#find_package(QT5 REQUIRED QtCore QtGui COMPONENTS Widgets)
+
+#include(${QT_USE_FILE})
+
+include(${PROJECT_SRC_PATH}/src.cmake)
+
+add_executable(${PROJECT_NAME} "${SRC_FILES}")# ${HEAD_FILES} ${RESOURCES_FILES} ${UI_FILES}")
+
+#set_target_properties(${PROJECT_NAME} PROPERTIES AUTOMOC ON)
+
+target_link_libraries(${PROJECT_NAME} Qt5::Widgets)

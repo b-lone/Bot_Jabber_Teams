@@ -1,0 +1,4 @@
+/Users/kuyou/Work/trunk/Bot_Jabber_Teams/bin/Debug/CMakeFiles/rebuild_cache.dir
+/Users/kuyou/Work/trunk/Bot_Jabber_Teams/bin/Debug/CMakeFiles/edit_cache.dir
+/Users/kuyou/Work/trunk/Bot_Jabber_Teams/bin/Debug/CMakeFiles/Bot.dir
+/Users/kuyou/Work/trunk/Bot_Jabber_Teams/bin/Debug/CMakeFiles/Bot_autogen.dir
