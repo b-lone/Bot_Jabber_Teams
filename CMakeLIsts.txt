@@ -19,7 +19,7 @@ find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
 include(${PROJECT_SRC_PATH}/src.cmake)
 
-add_executable(${PROJECT_NAME} "${SRC_FILES}")# ${HEAD_FILES} ${RESOURCES_FILES} ${UI_FILES}")
+add_executable(${PROJECT_NAME} ${SRC_FILES} ${HEAD_FILES} ${RESOURCES_FILES} ${UI_FILES})
 
 #set_target_properties(${PROJECT_NAME} PROPERTIES AUTOMOC ON)
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.8.1, 2019-03-18T17:33:29. -->
+<!-- Written by QtCreator 4.8.1, 2019-03-18T18:57:38. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -355,7 +355,7 @@
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
     <value type="QString" key="RunConfiguration.WorkingDirectory"></value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/Users/kuyou/Work/trunk/build-Bot_Jabber_Teams-Desktop_Qt_5_12_0_clang_64bit-Default</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/Users/kuyou/Work/trunk/Bot_Jabber_Teams/bin/Debug</value>
    </valuemap>
    <value type="int" key="ProjectExplorer.Target.RunConfigurationCount">1</value>
   </valuemap>
