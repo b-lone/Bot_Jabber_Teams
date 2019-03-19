@@ -12,7 +12,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
+find_package(Qt5 COMPONENTS Widgets Network REQUIRED)
 #find_package(QT5 REQUIRED QtCore QtGui COMPONENTS Widgets)
 
 #include(${QT_USE_FILE})
@@ -23,4 +23,7 @@ add_executable(${PROJECT_NAME} ${SRC_FILES} ${HEAD_FILES} ${RESOURCES_FILES} ${U
 
 #set_target_properties(${PROJECT_NAME} PROPERTIES AUTOMOC ON)
 
-target_link_libraries(${PROJECT_NAME} Qt5::Widgets)
+target_link_libraries(${PROJECT_NAME} Qt5::Widgets Qt5::Network)
+
+file(COPY "${PROJECT_SRC_PATH}/config" DESTINATION "${PROJECT_OUTPUT_PARH}/Debug")
+file(COPY "${PROJECT_SRC_PATH}/config" DESTINATION "${PROJECT_OUTPUT_PARH}/Release")

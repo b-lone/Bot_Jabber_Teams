@@ -15,6 +15,9 @@ public:
     explicit BotMainWindow(QWidget *parent = nullptr);
     ~BotMainWindow();
 
+private slots:
+    void on_btnSend_clicked();
+
 private:
     Ui::BotMainWindow *ui;
 };
