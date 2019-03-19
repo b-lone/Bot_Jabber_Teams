@@ -2,6 +2,7 @@
 #include <QSettings>
 
 const QString BotConfig::AccessToken = "bot/Access Token";
+const QString BotConfig::ListenPort = "local/Listen Port";
 
 BotConfig *BotConfig::Instance()
 {

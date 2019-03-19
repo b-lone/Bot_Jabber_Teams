@@ -3,12 +3,15 @@
 
 #include "botnetworkmanager.h"
 #include "botconfig.h"
+#include "botserver.h"
+#include <QDebug>
 
 BotMainWindow::BotMainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::BotMainWindow)
 {
     ui->setupUi(this);
+    qDebug() << SERVER->Listen();
 }
 
 BotMainWindow::~BotMainWindow()

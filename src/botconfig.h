@@ -11,6 +11,7 @@ public:
     static BotConfig * Instance();
 
     static const QString AccessToken;
+    static const QString ListenPort;
 
     QVariant Value(const QString & key);
     void SetValue(const QString & key, const QVariant & value);
