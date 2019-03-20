@@ -11,22 +11,17 @@ public:
     //init by json
     BotRoom(QJsonObject *jsonObject);
 
-   friend QDebug operator <<(QDebug os, BotRoom & br);
-
-    enum Type{
-        group,
-        direct
-    };
+   friend QDebug operator <<(QDebug os, BotRoom & rooom);
 
     QString id;
     QString title;
-    Type type;
+    QString type;
     bool isLocked;
     QString lastActivity;
     QString creatorId;
     QString created;
 };
 
-QDebug operator <<(QDebug qd, BotRoom & br);
+QDebug operator <<(QDebug qd, BotRoom & rooom);
 
 #endif // BOTROOM_H

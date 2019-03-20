@@ -8,31 +8,23 @@ BotRoom::BotRoom(QJsonObject *jsonObject)
     if(jsonObject){
         this->id = jsonObject->value("id").toString();
         this->title = jsonObject->value("title").toString();
-        {
-            auto sType = jsonObject->value("type").toString();
-            if(sType == "group"){
-                this->type = Type::group;
-            }
-            else if (sType == "direct") {
-                this->type = Type::direct;
-            }
-        }
+        this->type = jsonObject->value("type").toString();
         this->isLocked = jsonObject->value("isLocked").toBool();
         this->lastActivity = jsonObject->value("lastActivity").toString();
-        this->creatorId = jsonObject->value("created").toString();
-        this->created = jsonObject->value("creatorId").toString();
+        this->creatorId = jsonObject->value("creatorId").toString();
+        this->created = jsonObject->value("created").toString();
     }
 }
 
-QDebug operator <<(QDebug qd, BotRoom & br)
+QDebug operator <<(QDebug qd, BotRoom & room)
 {
     return qd << "[BotRoom]\n{"
-              << "\n    id:" << br.id
-              << "\n    title:" << br.title
-              << "\n    type:" << br.type
-              << "\n    isLocked:" << br.isLocked
-              << "\n    lastActivity:" << br.lastActivity
-              << "\n    creatorId:" << br.creatorId
-              << "\n    created:" << br.created
+              << "\n    id:" << room.id
+              << "\n    title:" << room.title
+              << "\n    type:" << room.type
+              << "\n    isLocked:" << room.isLocked
+              << "\n    lastActivity:" << room.lastActivity
+              << "\n    creatorId:" << room.creatorId
+              << "\n    created:" << room.created
               << "\n}";
 }

@@ -16,7 +16,11 @@ public:
     ~BotMainWindow();
 
 private slots:
-    void on_btnSend_clicked();
+    void on_btnRooms_clicked();
+
+    void on_btnMemberships_clicked();
+
+    void on_btnAddMem_clicked();
 
 private:
     Ui::BotMainWindow *ui;

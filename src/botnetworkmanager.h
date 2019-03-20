@@ -2,6 +2,7 @@
 #define BOTNETWORKMANAGER_H
 
 #include <QObject>
+#include <QJsonObject>
 class QNetworkAccessManager;
 class QNetworkRequest;
 class QNetworkReply;
@@ -30,13 +31,21 @@ class BotNetworkManager : public QObject
 public:
     static BotNetworkManager * Instance();
     void sendGetRooms();
+    //https://developer.webex.com/docs/api/v1/memberships/list-memberships
+    void sendGetMemberships(QString * queryParameters = nullptr);
+    //https://developer.webex.com/docs/api/v1/memberships/create-a-membership
+    void sendCreateAMembership(QString roomId, QString personEmail, bool isModerator);
 
 private slots:
     void on_GetRooms(BotNetworkReplyHelper * nrh);
+    void on_GetMemberships(BotNetworkReplyHelper * nrh);
+    void on_CreateAMembership(BotNetworkReplyHelper * nrh);
 
 private:
     explicit BotNetworkManager();
-    void SetHeaderAuthorization(QNetworkRequest & request);
+    void SetHeaderAuthorization( std::shared_ptr<QNetworkRequest> request);
+    std::shared_ptr<QNetworkRequest> NewRequest(const QUrl & url);
+    QJsonObject ExtractContect(BotNetworkReplyHelper * nrh);
 
 private:
     std::shared_ptr<QNetworkAccessManager> networkAccessManager;

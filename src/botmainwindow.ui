@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="btnSend">
+   <widget class="QPushButton" name="btnRooms">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -24,7 +24,33 @@
      </rect>
     </property>
     <property name="text">
-     <string>Send</string>
+     <string>Rooms</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnMemberships">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>70</y>
+      <width>114</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Memberships</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnAddMem">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>120</y>
+      <width>114</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Add a Mem</string>
     </property>
    </widget>
   </widget>
