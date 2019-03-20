@@ -1,5 +1,7 @@
 #include "botroom.h"
+
 #include <QJsonObject>
+#include <QDebug>
 
 BotRoom::BotRoom(QJsonObject *jsonObject)
 {
@@ -20,4 +22,17 @@ BotRoom::BotRoom(QJsonObject *jsonObject)
         this->creatorId = jsonObject->value("created").toString();
         this->created = jsonObject->value("creatorId").toString();
     }
+}
+
+QDebug operator <<(QDebug qd, BotRoom & br)
+{
+    return qd << "[BotRoom]\n{"
+              << "\n    id:" << br.id
+              << "\n    title:" << br.title
+              << "\n    type:" << br.type
+              << "\n    isLocked:" << br.isLocked
+              << "\n    lastActivity:" << br.lastActivity
+              << "\n    creatorId:" << br.creatorId
+              << "\n    created:" << br.created
+              << "\n}";
 }

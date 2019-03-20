@@ -6,6 +6,24 @@ class QNetworkAccessManager;
 class QNetworkRequest;
 class QNetworkReply;
 
+class BotNetworkReplyHelper : public QObject
+{
+    Q_OBJECT
+public:
+    BotNetworkReplyHelper(QNetworkReply * nr);
+    QNetworkReply * GetNetworkReply(){ return networkReply; }
+
+signals:
+    void finished(BotNetworkReplyHelper * nrh);
+
+private slots:
+    void on_finished();
+
+private:
+    QNetworkReply * networkReply;
+
+};
+
 class BotNetworkManager : public QObject
 {
     Q_OBJECT
@@ -14,7 +32,7 @@ public:
     void sendGetRooms();
 
 private slots:
-    void on_GetRooms();
+    void on_GetRooms(BotNetworkReplyHelper * nrh);
 
 private:
     explicit BotNetworkManager();
@@ -22,8 +40,6 @@ private:
 
 private:
     std::shared_ptr<QNetworkAccessManager> networkAccessManager;
-    QNetworkReply * replyGetRooms = nullptr;
-
 };
 
 #define NETMANAGER BotNetworkManager::Instance()

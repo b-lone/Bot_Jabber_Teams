@@ -6,7 +6,20 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include "botconfig.h"
+#include "botroom.h"
 
+//BotNetworkReplyHelper
+BotNetworkReplyHelper::BotNetworkReplyHelper(QNetworkReply *nr):networkReply(nr)
+{
+    connect(nr, &QNetworkReply::finished, this, &BotNetworkReplyHelper::on_finished);
+}
+
+void BotNetworkReplyHelper::on_finished()
+{
+    emit finished(this);
+}
+
+//BotNetworkManager
 BotNetworkManager::BotNetworkManager()
 {
     networkAccessManager = std::make_shared<QNetworkAccessManager>(this);
@@ -20,20 +33,22 @@ BotNetworkManager *BotNetworkManager::Instance()
 
 void BotNetworkManager::sendGetRooms()
 {
-    if(replyGetRooms)
-        return;
-
     QNetworkRequest request;
     request.setUrl(QUrl("https://api.ciscospark.com/v1/rooms"));
     SetHeaderAuthorization(request);
 
-    replyGetRooms = networkAccessManager->get(request);
-    connect(replyGetRooms, &QNetworkReply::finished, this, &BotNetworkManager::on_GetRooms);
+    QNetworkReply * reply = networkAccessManager->get(request);
+    BotNetworkReplyHelper * replyHelper = new BotNetworkReplyHelper(reply);
+    connect(replyHelper, &BotNetworkReplyHelper::finished, this, &BotNetworkManager::on_GetRooms);
 }
 
-void BotNetworkManager::on_GetRooms()
+void BotNetworkManager::on_GetRooms(BotNetworkReplyHelper * nrh)
 {
-    QByteArray data = replyGetRooms->readAll();
+    auto reply = nrh->GetNetworkReply();
+    delete nrh;
+
+    QByteArray data = reply->readAll();
+    reply->deleteLater();
 
     QJsonParseError jsonError;
     QJsonDocument jsonDoc(QJsonDocument::fromJson(data, &jsonError));
@@ -46,11 +61,11 @@ void BotNetworkManager::on_GetRooms()
 
     QJsonObject rootObj = jsonDoc.object();
 
-    QStringList keys = rootObj.keys();
-    for(int i = 0; i < keys.size(); i++)
-    {
-        qDebug() << "key" << i << " is:" << keys.at(i);
-    }
+//    QStringList keys = rootObj.keys();
+//    for(int i = 0; i < keys.size(); i++)
+//    {
+//        qDebug() << "key" << i << " is:" << keys.at(i);
+//    }
 
     if(rootObj.contains("items"))
     {
@@ -58,18 +73,10 @@ void BotNetworkManager::on_GetRooms()
         for(int i = 0; i< subArray.size(); i++)
         {
             QJsonObject subObject = subArray.at(i).toObject();
-            qDebug() << "id is:" << subObject.value("id").toString();
-            qDebug() << "title is:" << subObject.value("title").toString();
-            qDebug() << "type is:" << subObject.value("type").toString();
-            qDebug() << "isLocked is:" << subObject.value("isLocked").toString();
-            qDebug() << "lastActivity is:" << subObject.value("lastActivity").toString();
-            qDebug() << "creatorId is:" << subObject.value("creatorId").toString();
-            qDebug() << "created is:" << subObject.value("created").toString();
+            auto botroom = new BotRoom(&subObject);
+            qDebug() << *botroom;
         }
     }
-
-    replyGetRooms->deleteLater();
-    replyGetRooms = nullptr;
 }
 
 void BotNetworkManager::SetHeaderAuthorization(QNetworkRequest &request)
