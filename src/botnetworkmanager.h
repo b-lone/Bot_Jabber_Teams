@@ -32,14 +32,39 @@ public:
     static BotNetworkManager * Instance();
     void sendGetRooms();
     //https://developer.webex.com/docs/api/v1/memberships/list-memberships
-    void sendGetMemberships(QString * queryParameters = nullptr);
+    void sendGetMemberships(QString queryParameters = nullptr);
     //https://developer.webex.com/docs/api/v1/memberships/create-a-membership
     void sendCreateAMembership(QString roomId, QString personEmail, bool isModerator);
+    //https://developer.webex.com/docs/api/v1/memberships/get-membership-details
+    void sendGetMembership(QString membershipId);
+    //https://developer.webex.com/docs/api/v1/memberships/update-a-membership
+    void sendUpdateMembership(QString membershipId, bool isModerator);
+    //https://developer.webex.com/docs/api/v1/memberships/delete-a-membership
+    void sendDeleteMembership(QString membershipId);
+    //https://developer.webex.com/docs/api/v1/messages/list-messages
+    void sendListMessages(QString roomId);
+    //https://developer.webex.com/docs/api/v1/messages/list-direct-messages
+    void sendListDirectMessages(QString personEmail);
+    //https://developer.webex.com/docs/api/v1/messages/create-a-message
+    void sendCreateMessage(QString roomId,QString text, QString files = "");
+    //https://developer.webex.com/docs/api/v1/messages/get-message-details
+    void sendGetMessageDetails(QString messageId);
+    //https://developer.webex.com/docs/api/v1/messages/delete-a-message
+    void sendDeleteMessage(QString messageId);
+
 
 private slots:
     void on_GetRooms(BotNetworkReplyHelper * nrh);
     void on_GetMemberships(BotNetworkReplyHelper * nrh);
     void on_CreateAMembership(BotNetworkReplyHelper * nrh);
+    void on_GetMembership(BotNetworkReplyHelper * nrh);
+    void on_UpdateMembership(BotNetworkReplyHelper * nrh);
+    void on_DeleteMembership(BotNetworkReplyHelper * nrh);
+    void on_ListMessages(BotNetworkReplyHelper * nrh);
+    void on_ListDirectMessages(BotNetworkReplyHelper * nrh);
+    void on_CreateMessage(BotNetworkReplyHelper * nrh);
+    void on_GetMessageDetails(BotNetworkReplyHelper * nrh);
+    void on_DeleteMessage(BotNetworkReplyHelper * nrh);
 
 private:
     explicit BotNetworkManager();

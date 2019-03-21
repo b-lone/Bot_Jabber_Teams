@@ -6,6 +6,7 @@ ${PROJECT_SRC_PATH}/botconfig.cpp
 ${PROJECT_SRC_PATH}/botnetworkmanager.cpp
 ${PROJECT_SRC_PATH}/botserver.cpp
 ${PROJECT_SRC_PATH}/botmembership.cpp
+${PROJECT_SRC_PATH}/botmessage.cpp
 )
 
 set(HEAD_FILES
@@ -15,6 +16,7 @@ ${PROJECT_SRC_PATH}/botconfig.h
 ${PROJECT_SRC_PATH}/botnetworkmanager.h
 ${PROJECT_SRC_PATH}/botserver.h
 ${PROJECT_SRC_PATH}/botmembership.h
+${PROJECT_SRC_PATH}/botmessage.h
 )
 
 set(UI_FILES

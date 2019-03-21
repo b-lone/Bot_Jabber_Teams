@@ -20,7 +20,7 @@ BotMembership::BotMembership(QJsonObject *jsonObject)
 
 QDebug operator <<(QDebug qd, BotMembership & membership)
 {
-    return qd << "[BotRoom]\n{"
+    return qd << "[BotMembership]\n{"
               << "\n    id:" << membership.id
               << "\n    roomID:" << membership.roomID
               << "\n    personId:" << membership.personId

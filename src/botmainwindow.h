@@ -22,6 +22,22 @@ private slots:
 
     void on_btnAddMem_clicked();
 
+    void on_btnMembership_clicked();
+
+    void on_btnUpdateMem_clicked();
+
+    void on_btnDeleteMem_clicked();
+
+    void on_btnListMsg_clicked();
+
+    void on_btnListDMsg_clicked();
+
+    void on_btnCreateMsg_clicked();
+
+    void on_btnGetMsg_clicked();
+
+    void on_btnDeleteMsg_clicked();
+
 private:
     Ui::BotMainWindow *ui;
 };

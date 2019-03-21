@@ -53,6 +53,110 @@
      <string>Add a Mem</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="btnMembership">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>170</y>
+      <width>114</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Membership</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnUpdateMem">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>220</y>
+      <width>114</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Update Mem</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnDeleteMem">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>260</y>
+      <width>114</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Delete Mem</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnListMsg">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>300</y>
+      <width>114</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>List Msg</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnListDMsg">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>350</y>
+      <width>114</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>List DMsg</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnCreateMsg">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>400</y>
+      <width>114</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Create Msg</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnGetMsg">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>440</y>
+      <width>114</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Get a Msg</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnDeleteMsg">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>480</y>
+      <width>114</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Delete Msg</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
