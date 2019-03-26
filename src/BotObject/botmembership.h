@@ -3,7 +3,7 @@
 
 #include <QString>
 class QJsonObject;
-class QDebug;
+//class QDebug;
 
 
 class BotMembership

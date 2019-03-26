@@ -44,7 +44,7 @@ BotMessage::BotMessage(QJsonObject *jsonObject)
 
 QDebug operator <<(QDebug qd, BotMessage &message)
 {
-    return qd << "[BotMessage]\n{"
+    return qd << "\n[BotMessage]\n{"
               << "\n    id:" << message.id
               << "\n    roomId:" << message.roomId
               << "\n    roomType:" << message.roomType

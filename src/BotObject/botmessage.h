@@ -5,7 +5,7 @@
 #include <QStringList>
 
 class QJsonObject;
-class QDebug;
+//class QDebug;
 
 class BotMessage
 {

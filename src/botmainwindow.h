@@ -38,6 +38,28 @@ private slots:
 
     void on_btnDeleteMsg_clicked();
 
+    void on_btnListPeople_clicked();
+
+    void on_btnGetPersonDetails_clicked();
+
+    void on_btnCreateRoom_clicked();
+
+    void on_btnGetRoomDetails_clicked();
+
+    void on_btnUpdateRoom_clicked();
+
+    void on_btnDeleteRoom_clicked();
+
+    void on_btnListWebhooks_clicked();
+
+    void on_btnCreateWebhook_clicked();
+
+    void on_btnWebhookDetails_clicked();
+
+    void on_btnUpdateWebhook_clicked();
+
+    void on_btnDeleteWebhook_clicked();
+
 private:
     Ui::BotMainWindow *ui;
 };

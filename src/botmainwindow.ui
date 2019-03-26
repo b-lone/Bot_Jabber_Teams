@@ -14,148 +14,219 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="btnRooms">
+   <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>20</y>
-      <width>114</width>
-      <height>32</height>
+      <y>10</y>
+      <width>160</width>
+      <height>202</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Rooms</string>
-    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QPushButton" name="btnMemberships">
+       <property name="text">
+        <string>Memberships</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnMembership">
+       <property name="text">
+        <string>Membership</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnAddMem">
+       <property name="text">
+        <string>Add a Mem</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnUpdateMem">
+       <property name="text">
+        <string>Update Mem</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnDeleteMem">
+       <property name="text">
+        <string>Delete Mem</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
-   <widget class="QPushButton" name="btnMemberships">
+   <widget class="QWidget" name="verticalLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>70</y>
-      <width>114</width>
-      <height>32</height>
+      <x>10</x>
+      <y>240</y>
+      <width>160</width>
+      <height>168</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Memberships</string>
-    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QPushButton" name="btnListMsg">
+       <property name="text">
+        <string>List Msg</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnListDMsg">
+       <property name="text">
+        <string>List DMsg</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnCreateMsg">
+       <property name="text">
+        <string>Create Msg</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnGetMsg">
+       <property name="text">
+        <string>Get a Msg</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnDeleteMsg">
+       <property name="text">
+        <string>Delete Msg</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
-   <widget class="QPushButton" name="btnAddMem">
+   <widget class="QWidget" name="verticalLayoutWidget_3">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>120</y>
-      <width>114</width>
-      <height>32</height>
+      <x>200</x>
+      <y>40</y>
+      <width>160</width>
+      <height>80</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Add a Mem</string>
-    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_3">
+     <item>
+      <widget class="QPushButton" name="btnListPeople">
+       <property name="text">
+        <string>List People</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnGetPersonDetails">
+       <property name="text">
+        <string>Get Person</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
-   <widget class="QPushButton" name="btnMembership">
+   <widget class="QWidget" name="verticalLayoutWidget_4">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>170</y>
-      <width>114</width>
-      <height>32</height>
+      <x>200</x>
+      <y>240</y>
+      <width>160</width>
+      <height>168</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Membership</string>
-    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_4">
+     <item>
+      <widget class="QPushButton" name="btnRooms">
+       <property name="text">
+        <string>Rooms</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnCreateRoom">
+       <property name="text">
+        <string>Create Room</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnGetRoomDetails">
+       <property name="text">
+        <string>Get Room Detaols</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnUpdateRoom">
+       <property name="text">
+        <string>Update Room</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnDeleteRoom">
+       <property name="text">
+        <string>Delete Room</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
-   <widget class="QPushButton" name="btnUpdateMem">
+   <widget class="QWidget" name="verticalLayoutWidget_5">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>220</y>
-      <width>114</width>
-      <height>32</height>
+      <x>390</x>
+      <y>30</y>
+      <width>160</width>
+      <height>168</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Update Mem</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btnDeleteMem">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>260</y>
-      <width>114</width>
-      <height>32</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Delete Mem</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btnListMsg">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>300</y>
-      <width>114</width>
-      <height>32</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>List Msg</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btnListDMsg">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>350</y>
-      <width>114</width>
-      <height>32</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>List DMsg</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btnCreateMsg">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>400</y>
-      <width>114</width>
-      <height>32</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Create Msg</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btnGetMsg">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>440</y>
-      <width>114</width>
-      <height>32</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Get a Msg</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btnDeleteMsg">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>480</y>
-      <width>114</width>
-      <height>32</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Delete Msg</string>
-    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_5">
+     <item>
+      <widget class="QPushButton" name="btnUpdateWebhook">
+       <property name="text">
+        <string>Update Webhook</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnListWebhooks">
+       <property name="text">
+        <string>List Webhooks</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnCreateWebhook">
+       <property name="text">
+        <string>Create Webhook</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnWebhookDetails">
+       <property name="text">
+        <string>Webhoook Details</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnDeleteWebhook">
+       <property name="text">
+        <string>Delete Webhook</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

@@ -19,11 +19,17 @@ find_package(Qt5 COMPONENTS Widgets Network REQUIRED)
 
 include(${PROJECT_SRC_PATH}/src.cmake)
 
+#add_library(BotObject STATIC ${OBJ_SRC} ${OBJ_HEAD})
+#target_link_libraries(BotObject Qt5::Core)
+#install(TARGETS BotObject LIBRARY DESTINATION ${PROJECT_ROOT_PATH}/lib)
+#install(FILES ${OBJ_HEAD} DESTINATION ${PROJECT_ROOT_PATH}/lib/include)
+#include_directories(lib/include)
+
 add_executable(${PROJECT_NAME} ${SRC_FILES} ${HEAD_FILES} ${RESOURCES_FILES} ${UI_FILES})
-
-#set_target_properties(${PROJECT_NAME} PROPERTIES AUTOMOC ON)
-
-target_link_libraries(${PROJECT_NAME} Qt5::Widgets Qt5::Network)
+target_link_libraries(${PROJECT_NAME}
+Qt5::Widgets
+Qt5::Network
+)
 
 file(COPY "${PROJECT_SRC_PATH}/config" DESTINATION "${PROJECT_OUTPUT_PARH}/Debug")
 file(COPY "${PROJECT_SRC_PATH}/config" DESTINATION "${PROJECT_OUTPUT_PARH}/Release")
