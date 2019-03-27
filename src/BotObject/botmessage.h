@@ -11,6 +11,7 @@ class BotMessage
 {
 public:
     //init by json
+    BotMessage() = default;
     BotMessage(QJsonObject *jsonObject);
     friend QDebug operator <<(QDebug qd, BotMessage & message);
 
@@ -21,6 +22,7 @@ public:
     QString toPersonEmail;
     QString text;
     QString markdown;
+    QString html;
     QStringList files;
     QString personId;
     QString personEmail;

@@ -7,6 +7,8 @@
 #include <QHttpMultiPart>
 #include <QFile>
 #include <QFileInfo>
+#include <QMimeDatabase>
+#include <QMetaEnum>
 #include "botconfig.h"
 #include "botroom.h"
 #include "botmembership.h"
@@ -58,7 +60,7 @@ std::shared_ptr<QNetworkRequest> BotNetworkRepquestHelper::GennerateRequest()
             sUrl = sUrl + key + "=" + params[key];
         }
     }
-    BOTOUT(sUrl);
+    BOTLOG(sUrl);
     request->setUrl(sUrl);
     return request;
 }
@@ -70,11 +72,15 @@ void BotNetworkRepquestHelper::setContentType(const QString &contentType)
 
 QString BotNetworkRepquestHelper::RequestTypeToString(BotNetworkRepquestHelper::RequestType type)
 {
-    static QMap<RequestType, QString> queryList = {
-        {RequestType::Memberships, "memberships"},
-        {RequestType::Messages, "messages"}
-    };
-    return queryList[type];
+    return  QMetaEnum::fromType<RequestType>().valueToKey(type);
+//    static QMap<RequestType, QString> queryList = {
+//        {RequestType::memberships, "memberships"},
+//        {RequestType::messages, "messages"},
+//        {RequestType::people, "people"},
+//        {RequestType::rooms, "rooms"},
+//        {RequestType::webhooks, "webhooks"}
+//    };
+//    return queryList[type];
 }
 
 //BotNetworkManager
@@ -91,7 +97,7 @@ BotNetworkManager *BotNetworkManager::Instance()
 
 void BotNetworkManager::sendGetMemberships(QString roomId, QString filterString, bool isFilterByPersonId)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::Memberships);
+    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::memberships);
     if(roomId != ""){
         networkRequestHelper.setParams("roomId",roomId);
         if(filterString != ""){
@@ -110,7 +116,7 @@ void BotNetworkManager::sendGetMemberships(QString roomId, QString filterString,
 
 void BotNetworkManager::sendCreateAMembership(QString roomId, bool isModerator, QString byString, bool isByEmail)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::Memberships);
+    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::memberships);
     networkRequestHelper.setContentType(BotNetworkRepquestHelper::contentType_Json);
     auto request = networkRequestHelper.GennerateRequest();
 
@@ -123,12 +129,12 @@ void BotNetworkManager::sendCreateAMembership(QString roomId, bool isModerator, 
         jsonObject.insert("personId", byString);
     }
 
-    SendAndConnect(SendType::Post, request, &BotNetworkManager::on_CreateAMembership, jsonObject);
+    SendAndConnect(SendType::Post, request, &BotNetworkManager::on_CreateAMembership, QJsonDocument(jsonObject).toJson());
 }
 
 void BotNetworkManager::sendGetMembership(QString membershipId)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::Memberships);
+    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::memberships);
     networkRequestHelper.setObjectId(membershipId);
     auto request = networkRequestHelper.GennerateRequest();
 
@@ -137,7 +143,7 @@ void BotNetworkManager::sendGetMembership(QString membershipId)
 
 void BotNetworkManager::sendUpdateMembership(QString membershipId, bool isModerator)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::Memberships);
+    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::memberships);
     networkRequestHelper.setObjectId(membershipId);
     networkRequestHelper.setContentType(BotNetworkRepquestHelper::contentType_Json);
     auto request = networkRequestHelper.GennerateRequest();
@@ -145,12 +151,12 @@ void BotNetworkManager::sendUpdateMembership(QString membershipId, bool isModera
     QJsonObject jsonObject;
     jsonObject.insert("isModerator", isModerator);
 
-    SendAndConnect(SendType::Put, request, &BotNetworkManager::on_UpdateMembership, jsonObject);
+    SendAndConnect(SendType::Put, request, &BotNetworkManager::on_UpdateMembership, QJsonDocument(jsonObject).toJson());
 }
 
 void BotNetworkManager::sendDeleteMembership(QString membershipId)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::Memberships);
+    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::memberships);
     networkRequestHelper.setObjectId(membershipId);
     auto request = networkRequestHelper.GennerateRequest();
 
@@ -159,7 +165,7 @@ void BotNetworkManager::sendDeleteMembership(QString membershipId)
 
 void BotNetworkManager::sendListMessages(QString roomId, QString mentionedPeople, QString before, QString beforeMessage, int max)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::Messages);
+    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::messages);
     networkRequestHelper.setParams("roomId", roomId);
     if(mentionedPeople != ""){
         networkRequestHelper.setParams("mentionedPeople", mentionedPeople);
@@ -178,7 +184,7 @@ void BotNetworkManager::sendListMessages(QString roomId, QString mentionedPeople
 
 void BotNetworkManager::sendListDirectMessages(QString byString, bool isByEmail)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::Messages);
+    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::messages);
     networkRequestHelper.setObjectId("direct");
     if(isByEmail){
         networkRequestHelper.setParams("personEmail", byString);
@@ -190,230 +196,272 @@ void BotNetworkManager::sendListDirectMessages(QString byString, bool isByEmail)
     SendAndConnect(SendType::Get, request, &BotNetworkManager::on_ListDirectMessages);
 }
 
-void BotNetworkManager::sendCreateMessage(QString roomId, QString text, QString files)
+void BotNetworkManager::sendCreateMessage(const BotMessage &message)
 {
-    auto request = this->NewRequest(QUrl("https://api.ciscospark.com/v1/messages"));
+    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::messages);
+    auto request = networkRequestHelper.GennerateRequest();
 
-
-    QNetworkReply * reply;
-
-    if(files == "")
-    {
-        request->setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, "application/json");
-
-        QJsonObject jsonObject;
-        jsonObject.insert("roomId", roomId);
-        jsonObject.insert("text", text);
-//        jsonObject.insert("markdown", "**PROJECT UPDATE** A new project plan has been published [on Box](http://box.com/s/lf5vj)."
-//        "The PM for this project is <@personEmail:mike@example.com> and the Engineering Manager is <@personEmail:jane@example.com>.");
-
-        reply = networkAccessManager->post(*(request.get()), QJsonDocument(jsonObject).toJson(QJsonDocument::JsonFormat::Compact));
+    QHttpMultiPart * multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+    if(message.roomId != ""){
+        BOTLOG("Create by roomId.");
+        QHttpPart roomIdPart;
+        roomIdPart.setHeader(QNetworkRequest::KnownHeaders::ContentDispositionHeader, "form-data; name=\"roomId\"");
+        roomIdPart.setBody(message.roomId.toUtf8());
+        multiPart->append(roomIdPart);
+    }else if (message.toPersonId != "") {
+        BOTLOG("Create by personId.");
+        QHttpPart toPersonIdPart;
+        toPersonIdPart.setHeader(QNetworkRequest::KnownHeaders::ContentDispositionHeader, "form-data; name=\"toPersonId\"");
+        toPersonIdPart.setBody(message.toPersonId.toUtf8());
+        multiPart->append(toPersonIdPart);
+    }else if (message.toPersonEmail != "") {
+        BOTLOG("Create by personEmail.");
+        QHttpPart toPersonEmailPart;
+        toPersonEmailPart.setHeader(QNetworkRequest::KnownHeaders::ContentDispositionHeader, "form-data; name=\"toPersonEmail\"");
+        toPersonEmailPart.setBody(message.toPersonEmail.toUtf8());
+        multiPart->append(toPersonEmailPart);
     }else {
-        QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
-
-        {
-            QHttpPart textPart;
-            textPart.setHeader(QNetworkRequest::KnownHeaders::ContentDispositionHeader, "form-data; name=\"roomId\"");
-            textPart.setBody(roomId.toUtf8());
-
-            multiPart->append(textPart);
-        }
-        {
-            QHttpPart imagePart;
-            imagePart.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, "image/png");
-            imagePart.setHeader(QNetworkRequest::KnownHeaders::ContentDispositionHeader, "form-data; name=\"files\"; filename =\"image.png\"");
-
-            QFile * file = new QFile(files);
-            file->open(QIODevice::ReadOnly);
-            imagePart.setBodyDevice(file);
-            file->setParent(multiPart);
-
-            multiPart->append(imagePart);
-        }
-        reply = networkAccessManager->post(*(request.get()), multiPart);
-        multiPart->setParent(reply);
+        BOTLOG("No destination!");
+        return;
     }
 
-    BotNetworkReplyHelper * replyHelper = new BotNetworkReplyHelper(reply);
-    connect(replyHelper, &BotNetworkReplyHelper::finished, this, &BotNetworkManager::on_CreateMessage);
+    bool ifHaveContent = false;
+    if(message.text != "") {
+        QHttpPart textPart;
+        textPart.setHeader(QNetworkRequest::KnownHeaders::ContentDispositionHeader, "form-data; name=\"text\"");
+        textPart.setBody(message.text.toUtf8());
+        multiPart->append(textPart);
+
+        ifHaveContent = true;
+    }
+    if(message.markdown != "") {
+        QHttpPart markdownPart;
+        markdownPart.setHeader(QNetworkRequest::KnownHeaders::ContentDispositionHeader, "form-data; name=\"markdown\"");
+        markdownPart.setBody(message.markdown.toUtf8());
+        multiPart->append(markdownPart);
+
+        ifHaveContent = true;
+    }
+    if(message.files.count()) {
+        QHttpPart filesPart;
+        QString filePath = message.files[0];
+
+        QFile * file = new QFile(filePath);
+        if(file->open(QIODevice::ReadOnly)){
+            filesPart.setBodyDevice(file);
+            file->setParent(multiPart);
+        }else {
+            BOTLOG("File open failed!");
+            delete multiPart;
+            delete file;
+            return;
+        }
+
+        QMimeType type = QMimeDatabase().mimeTypeForFile(filePath);
+        BOTLOG(type.name());
+        filesPart.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, type.name());
+        filesPart.setHeader(QNetworkRequest::KnownHeaders::ContentDispositionHeader, "form-data; name=\"files\" ;filename =" + file->fileName());
+
+        multiPart->append(filesPart);
+
+        ifHaveContent = true;
+    }
+
+    if(!ifHaveContent){
+        BOTLOG("Error:No Content!");
+        return;
+    }
+
+    SendAndConnect(SendType::Post, request, &BotNetworkManager::on_CreateMessage, multiPart);
 }
 
 void BotNetworkManager::sendGetMessageDetails(QString messageId)
 {
-    QString surl = QString("https://api.ciscospark.com/v1/messages/") + messageId;
-    auto request = this->NewRequest(QUrl(surl));
+    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::messages);
+    networkRequestHelper.setObjectId(messageId);
+    auto request = networkRequestHelper.GennerateRequest();
 
-    QNetworkReply * reply = networkAccessManager->get(*(request.get()));
-    BotNetworkReplyHelper * replyHelper = new BotNetworkReplyHelper(reply);
-    connect(replyHelper, &BotNetworkReplyHelper::finished, this, &BotNetworkManager::on_GetMessageDetails);
+    SendAndConnect(SendType::Get, request, &BotNetworkManager::on_GetMessageDetails);
 }
 
 void BotNetworkManager::sendDeleteMessage(QString messageId)
 {
-    QString surl = QString("https://api.ciscospark.com/v1/messages/") + messageId;
-    auto request = this->NewRequest(QUrl(surl));
+    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::messages);
+    networkRequestHelper.setObjectId(messageId);
+    auto request = networkRequestHelper.GennerateRequest();
 
-    QNetworkReply * reply = networkAccessManager->deleteResource(*(request.get()));
-    BotNetworkReplyHelper * replyHelper = new BotNetworkReplyHelper(reply);
-    connect(replyHelper, &BotNetworkReplyHelper::finished, this, &BotNetworkManager::on_DeleteMessage);
+    SendAndConnect(SendType::Delete, request, &BotNetworkManager::on_DeleteMessage);
 }
 
-void BotNetworkManager::sendListPeople(QString email)
+void BotNetworkManager::sendListPeople(QString byString, int byWhat, int max)
 {
-    QString surl = QString("https://api.ciscospark.com/v1/people?email=") + email;
-    auto request = this->NewRequest(QUrl(surl));
+    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::people);
+    switch(byWhat){
+    case 0:
+        networkRequestHelper.setParams("email", byString);
+        break;
+    case 1:
+        networkRequestHelper.setParams("displayName", byString);
+        break;
+    case 2:
+        networkRequestHelper.setParams("id", byString);
+        break;
+    default:
+        BOTLOG("Error:Unexcepted option!");
+        return;
+    }
+    networkRequestHelper.setParams("max", QString::number(max));
+    auto request = networkRequestHelper.GennerateRequest();
 
-    QNetworkReply * reply = networkAccessManager->get(*(request.get()));
-    BotNetworkReplyHelper * replyHelper = new BotNetworkReplyHelper(reply);
-    connect(replyHelper, &BotNetworkReplyHelper::finished, this, &BotNetworkManager::on_ListPeople);
+    SendAndConnect(SendType::Get, request, &BotNetworkManager::on_ListPeople);
 }
 
 void BotNetworkManager::sendGetPersonDetails(QString personId)
 {
-    QString surl = QString("https://api.ciscospark.com/v1/people/") + personId;
-    auto request = this->NewRequest(QUrl(surl));
+    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::people);
+    networkRequestHelper.setObjectId(personId);
+    auto request = networkRequestHelper.GennerateRequest();
 
-    QNetworkReply * reply = networkAccessManager->get(*(request.get()));
-    BotNetworkReplyHelper * replyHelper = new BotNetworkReplyHelper(reply);
-    connect(replyHelper, &BotNetworkReplyHelper::finished, this, &BotNetworkManager::on_GetPersonDetails);
+    SendAndConnect(SendType::Get, request, &BotNetworkManager::on_GetPersonDetails);
 }
 
-void BotNetworkManager::sendListRooms()
+void BotNetworkManager::sendListRooms(QString type, QString sortBy, int max)
 {
-    QString surl = QString("https://api.ciscospark.com/v1/rooms");
-    auto request = this->NewRequest(QUrl(surl));
+    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::rooms);
+    if(type != ""){
+        networkRequestHelper.setParams("type", type);
+    }
+    if(sortBy != ""){
+        networkRequestHelper.setParams("sortBy", sortBy);
+    }
+    networkRequestHelper.setParams("max", QString::number(max));
+    auto request = networkRequestHelper.GennerateRequest();
 
-    QNetworkReply * reply = networkAccessManager->get(*(request.get()));
-    BotNetworkReplyHelper * replyHelper = new BotNetworkReplyHelper(reply);
-    connect(replyHelper, &BotNetworkReplyHelper::finished, this, &BotNetworkManager::on_ListRooms);
+    SendAndConnect(SendType::Get, request, &BotNetworkManager::on_ListRooms);
 }
 
 void BotNetworkManager::sendCreateRoom(QString title)
 {
-    QString surl = QString("https://api.ciscospark.com/v1/rooms/");
-    auto request = this->NewRequest(QUrl(surl));
-    request->setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, "application/json");
+    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::rooms);
+    networkRequestHelper.setContentType(BotNetworkRepquestHelper::contentType_Json);
+    auto request = networkRequestHelper.GennerateRequest();
 
     QJsonObject jsonObject;
     jsonObject.insert("title", title);
 
-    QNetworkReply * reply = networkAccessManager->post(*(request.get()), QJsonDocument(jsonObject).toJson());
-    BotNetworkReplyHelper * replyHelper = new BotNetworkReplyHelper(reply);
-    connect(replyHelper, &BotNetworkReplyHelper::finished, this, &BotNetworkManager::on_CreateRoom);
+    SendAndConnect(SendType::Post, request, &BotNetworkManager::on_CreateRoom, QJsonDocument(jsonObject).toJson());
 }
 
 void BotNetworkManager::sendGetRoomDetails(QString roomId)
 {
-    QString surl = QString("https://api.ciscospark.com/v1/rooms/") + roomId;
-    auto request = this->NewRequest(QUrl(surl));
+    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::rooms);
+    networkRequestHelper.setObjectId(roomId);
+    auto request = networkRequestHelper.GennerateRequest();
 
-    QNetworkReply * reply = networkAccessManager->get(*(request.get()));
-    BotNetworkReplyHelper * replyHelper = new BotNetworkReplyHelper(reply);
-    connect(replyHelper, &BotNetworkReplyHelper::finished, this, &BotNetworkManager::on_GetRoomDetails);
+    SendAndConnect(SendType::Delete, request, &BotNetworkManager::on_GetRoomDetails);
 }
 
 void BotNetworkManager::sendUpdateRoom(QString roomId, QString title)
 {
-    QString surl = QString("https://api.ciscospark.com/v1/rooms/") + roomId;
-    auto request = this->NewRequest(QUrl(surl));
-    request->setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, "application/json");
+    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::rooms);
+    networkRequestHelper.setContentType(BotNetworkRepquestHelper::contentType_Json);
+    networkRequestHelper.setObjectId(roomId);
+    auto request = networkRequestHelper.GennerateRequest();
 
     QJsonObject jsonObject;
     jsonObject.insert("title", title);
 
-    QNetworkReply * reply = networkAccessManager->put(*(request.get()), QJsonDocument(jsonObject).toJson());
-    BotNetworkReplyHelper * replyHelper = new BotNetworkReplyHelper(reply);
-    connect(replyHelper, &BotNetworkReplyHelper::finished, this, &BotNetworkManager::on_UpdateRoom);
+    SendAndConnect(SendType::Put, request, &BotNetworkManager::on_UpdateRoom, QJsonDocument(jsonObject).toJson());
 }
 
 void BotNetworkManager::sendDeleteRoom(QString roomId)
 {
-    QString surl = QString("https://api.ciscospark.com/v1/rooms/") + roomId;
-    auto request = this->NewRequest(QUrl(surl));
+    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::rooms);
+    networkRequestHelper.setObjectId(roomId);
+    auto request = networkRequestHelper.GennerateRequest();
 
-    QNetworkReply * reply = networkAccessManager->deleteResource(*(request.get()));
-    BotNetworkReplyHelper * replyHelper = new BotNetworkReplyHelper(reply);
-    connect(replyHelper, &BotNetworkReplyHelper::finished, this, &BotNetworkManager::on_DeleteRoom);
+    SendAndConnect(SendType::Delete, request, &BotNetworkManager::on_DeleteRoom);
 }
 
-void BotNetworkManager::sendListWebhooks()
+void BotNetworkManager::sendListWebhooks(int max)
 {
-    auto request = this->NewRequest(QUrl("https://api.ciscospark.com/v1/webhooks"));
+    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::webhooks);
+    networkRequestHelper.setParams("max", QString::number(max));
+    auto request = networkRequestHelper.GennerateRequest();
 
-    QNetworkReply * reply = networkAccessManager->get(*(request.get()));
-    BotNetworkReplyHelper * replyHelper = new BotNetworkReplyHelper(reply);
-    connect(replyHelper, &BotNetworkReplyHelper::finished, this, &BotNetworkManager::on_ListWebhooks);
+    SendAndConnect(SendType::Get, request, &BotNetworkManager::on_ListWebhooks);
 }
 
 void BotNetworkManager::sendCreateWebhook(BotWebhook & webhook)
 {
-    auto request = this->NewRequest(QUrl("https://api.ciscospark.com/v1/webhooks"));
-    request->setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, "application/json");
+    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::webhooks);
+    networkRequestHelper.setContentType(BotNetworkRepquestHelper::contentType_Json);
+    auto request = networkRequestHelper.GennerateRequest();
 
     auto jsonObjectPtr = webhook.Wrap();
 
-    QNetworkReply * reply = networkAccessManager->post(*request, QJsonDocument(*jsonObjectPtr).toJson());
-    BotNetworkReplyHelper * replyHelper = new BotNetworkReplyHelper(reply);
-    connect(replyHelper, &BotNetworkReplyHelper::finished, this, &BotNetworkManager::on_CreateWebHook);
+    SendAndConnect(SendType::Post, request, &BotNetworkManager::on_CreateWebHook, QJsonDocument(*jsonObjectPtr).toJson());
 }
 
 void BotNetworkManager::sendGetWebhookDetails(QString webhookId)
 {
-    QString surl = QString("https://api.ciscospark.com/v1/webhooks/") + webhookId;
-    auto request = this->NewRequest(QUrl(surl));
+    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::webhooks);
+    networkRequestHelper.setObjectId(webhookId);
+    auto request = networkRequestHelper.GennerateRequest();
 
-    QNetworkReply * reply = networkAccessManager->get(*(request.get()));
-    BotNetworkReplyHelper * replyHelper = new BotNetworkReplyHelper(reply);
-    connect(replyHelper, &BotNetworkReplyHelper::finished, this, &BotNetworkManager::on_GetWebhookDetails);
+    SendAndConnect(SendType::Get, request, &BotNetworkManager::on_GetWebhookDetails);
 }
 
-void BotNetworkManager::sendUpdateWebhook(QString webhookId, QString name)
+void BotNetworkManager::sendUpdateWebhook(QString webhookId, QString name, QString targetUrl, QString status)
 {
-    QString surl = QString("https://api.ciscospark.com/v1/webhooks/") + webhookId;
-    auto request = this->NewRequest(QUrl(surl));
-    request->setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, "application/json");
+    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::webhooks);
+    networkRequestHelper.setContentType(BotNetworkRepquestHelper::contentType_Json);
+    networkRequestHelper.setObjectId(webhookId);
+    auto request = networkRequestHelper.GennerateRequest();
 
     QJsonObject jsonObject;
     jsonObject.insert("name", name);
-    jsonObject.insert("targetUrl", "https://6eca506c.ngrok.io");
+    jsonObject.insert("targetUrl", targetUrl);
+    jsonObject.insert("status", status);
 
-    QNetworkReply * reply = networkAccessManager->put(*(request.get()), QJsonDocument(jsonObject).toJson());
-    BotNetworkReplyHelper * replyHelper = new BotNetworkReplyHelper(reply);
-    connect(replyHelper, &BotNetworkReplyHelper::finished, this, &BotNetworkManager::on_UpdateWebhook);
+    SendAndConnect(SendType::Put, request, &BotNetworkManager::on_UpdateWebhook, QJsonDocument(jsonObject).toJson());
 }
 
 void BotNetworkManager::sendDeleteWebhook(QString webhookId)
 {
-    QString surl = QString("https://api.ciscospark.com/v1/webhooks/") + webhookId;
-    auto request = this->NewRequest(QUrl(surl));
+    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::rooms);
+    networkRequestHelper.setObjectId(webhookId);
+    auto request = networkRequestHelper.GennerateRequest();
 
-    QNetworkReply * reply = networkAccessManager->deleteResource(*(request.get()));
-    BotNetworkReplyHelper * replyHelper = new BotNetworkReplyHelper(reply);
-    connect(replyHelper, &BotNetworkReplyHelper::finished, this, &BotNetworkManager::on_DeleteWebhook);
+    SendAndConnect(SendType::Delete, request, &BotNetworkManager::on_DeleteWebhook);
 }
 
 void BotNetworkManager::on_GetMemberships(BotNetworkReplyHelper *nrh)
 {
-    QJsonObject rootObj = this->ExtractContect(nrh);
+    auto rootObj = this->ExtractContect(nrh);
 
-    if(rootObj.contains("items"))
-    {
-        QJsonArray subArray = rootObj.value("items").toArray();
-        for(int i = 0; i< subArray.size(); i++)
-        {
-            QJsonObject subObject = subArray.at(i).toObject();
-            auto botmembership = new BotMembership(&subObject);
-            qDebug() << *botmembership;
+    if(rootObj){
+        if(rootObj->contains("items")){
+            QJsonArray subArray = rootObj->value("items").toArray();
+            for(int i = 0; i< subArray.size(); i++)
+            {
+                QJsonObject subObject = subArray.at(i).toObject();
+                auto botmembership = new BotMembership(&subObject);
+                BOTLOG(*botmembership);
+            }
         }
     }
+
 }
 
 void BotNetworkManager::on_CreateAMembership(BotNetworkReplyHelper *nrh)
 {
-    QJsonObject rootObj = this->ExtractContect(nrh);
+    auto rootObj = this->ExtractContect(nrh);
 
-    auto botmembership = new BotMembership(&rootObj);
-    qDebug() << *botmembership;
+    if(rootObj){
+        auto botmembership = new BotMembership(rootObj.get());
+        BOTLOG(*botmembership);
+    }
 }
 
 void BotNetworkManager::on_GetMembership(BotNetworkReplyHelper *nrh)
@@ -433,16 +481,17 @@ void BotNetworkManager::on_DeleteMembership(BotNetworkReplyHelper *nrh)
 
 void BotNetworkManager::on_ListMessages(BotNetworkReplyHelper *nrh)
 {
-    QJsonObject rootObj = this->ExtractContect(nrh);
+    auto rootObj = this->ExtractContect(nrh);
 
-    if(rootObj.contains("items"))
-    {
-        QJsonArray subArray = rootObj.value("items").toArray();
-        for(int i = 0; i< subArray.size(); i++)
-        {
-            QJsonObject subObject = subArray.at(i).toObject();
-            auto botmessage = new BotMessage(&subObject);
-            qDebug() << *botmessage;
+    if(rootObj){
+        if(rootObj->contains("items")){
+            QJsonArray subArray = rootObj->value("items").toArray();
+            for(int i = 0; i< subArray.size(); i++)
+            {
+                QJsonObject subObject = subArray.at(i).toObject();
+                auto botmessage = new BotMessage(&subObject);
+                BOTLOG(*botmessage);
+            }
         }
     }
 }
@@ -454,10 +503,12 @@ void BotNetworkManager::on_ListDirectMessages(BotNetworkReplyHelper *nrh)
 
 void BotNetworkManager::on_CreateMessage(BotNetworkReplyHelper *nrh)
 {
-    QJsonObject rootObj = this->ExtractContect(nrh);
+    auto rootObj = this->ExtractContect(nrh);
 
-    auto botmessage= new BotMessage(&rootObj);
-    qDebug() << *botmessage;
+    if(rootObj){
+        auto botmessage= new BotMessage(rootObj.get());
+        BOTLOG(*botmessage);
+    }
 }
 
 void BotNetworkManager::on_GetMessageDetails(BotNetworkReplyHelper *nrh)
@@ -472,55 +523,55 @@ void BotNetworkManager::on_DeleteMessage(BotNetworkReplyHelper *nrh)
 
 void BotNetworkManager::on_ListPeople(BotNetworkReplyHelper *nrh)
 {
-    QJsonObject rootObj = this->ExtractContect(nrh);
+    auto rootObj = this->ExtractContect(nrh);
 
-    if(rootObj.contains("items"))
-    {
-        QJsonArray subArray = rootObj.value("items").toArray();
-        for(int i = 0; i< subArray.size(); i++)
-        {
-            QJsonObject subObject = subArray.at(i).toObject();
-            auto botpeople = new BotPeople(&subObject);
-            qDebug() << *botpeople;
+    if(rootObj){
+        if(rootObj->contains("items")){
+            QJsonArray subArray = rootObj->value("items").toArray();
+            for(int i = 0; i< subArray.size(); i++)
+            {
+                QJsonObject subObject = subArray.at(i).toObject();
+                auto botpeople = new BotPeople(&subObject);
+                BOTLOG(*botpeople);
+            }
         }
     }
 }
 
 void BotNetworkManager::on_GetPersonDetails(BotNetworkReplyHelper *nrh)
 {
-    QJsonObject rootObj = this->ExtractContect(nrh);
+    auto rootObj = this->ExtractContect(nrh);
 
-    auto botpeople = new BotPeople(&rootObj);
-    qDebug() << *botpeople;
+    if(rootObj){
+        auto botpeople = new BotPeople(rootObj.get());
+        BOTLOG(*botpeople);
+    }
 }
 
 void BotNetworkManager::on_ListRooms(BotNetworkReplyHelper *nrh)
 {
-    QJsonObject rootObj = this->ExtractContect(nrh);
+    auto rootObj = this->ExtractContect(nrh);
 
-    if(rootObj.contains("items"))
-    {
-        QJsonArray subArray = rootObj.value("items").toArray();
-        for(int i = 0; i< subArray.size(); i++)
-        {
-            QJsonObject subObject = subArray.at(i).toObject();
+//    if(rootObj.contains("items"))
+//    {
+//        QJsonArray subArray = rootObj.value("items").toArray();
+//        for(int i = 0; i< subArray.size(); i++)
+//        {
+//            QJsonObject subObject = subArray.at(i).toObject();
 //            auto botroom = new BotRoom(subObject);
 //            qDebug() << *botroom;
-        }
-    }
+//        }
+//    }
 }
 
 void BotNetworkManager::on_CreateRoom(BotNetworkReplyHelper *nrh)
 {
-    QJsonObject rootObj = this->ExtractContect(nrh);
-
-//    auto botroom = new BotRoom(rootObj);
-//    qDebug() << *botroom;
+    on_GetRoomDetails(nrh);
 }
 
 void BotNetworkManager::on_GetRoomDetails(BotNetworkReplyHelper *nrh)
 {
-    QJsonObject rootObj = this->ExtractContect(nrh);
+    auto rootObj = this->ExtractContect(nrh);
 
 //    auto botroom = new BotRoom(rootObj);
 //    qDebug() << *botroom;
@@ -528,10 +579,7 @@ void BotNetworkManager::on_GetRoomDetails(BotNetworkReplyHelper *nrh)
 
 void BotNetworkManager::on_UpdateRoom(BotNetworkReplyHelper *nrh)
 {
-    QJsonObject rootObj = this->ExtractContect(nrh);
-
-//    auto botroom = new BotRoom(rootObj);
-//    qDebug() << *botroom;
+    on_GetRoomDetails(nrh);
 }
 
 void BotNetworkManager::on_DeleteRoom(BotNetworkReplyHelper *nrh)
@@ -541,42 +589,39 @@ void BotNetworkManager::on_DeleteRoom(BotNetworkReplyHelper *nrh)
 
 void BotNetworkManager::on_ListWebhooks(BotNetworkReplyHelper *nrh)
 {
-    QJsonObject rootObj = this->ExtractContect(nrh);
+    auto rootObj = this->ExtractContect(nrh);
 
-    if(rootObj.contains("items"))
-    {
-        QJsonArray subArray = rootObj.value("items").toArray();
-        for(int i = 0; i< subArray.size(); i++)
-        {
-            QJsonObject subObject = subArray.at(i).toObject();
-            auto botwebhook = new BotWebhook(&subObject);
-            qDebug() << *botwebhook;
+    if(rootObj){
+        if(rootObj->contains("items")){
+            QJsonArray subArray = rootObj->value("items").toArray();
+            for(int i = 0; i< subArray.size(); i++)
+            {
+                QJsonObject subObject = subArray.at(i).toObject();
+                auto botwebhook = new BotWebhook(&subObject);
+                BOTLOG(*botwebhook);
+            }
         }
     }
 }
 
 void BotNetworkManager::on_CreateWebHook(BotNetworkReplyHelper *nrh)
 {
-    QJsonObject rootObj = this->ExtractContect(nrh);
+    auto rootObj = this->ExtractContect(nrh);
 
-    auto botwebhook = new BotWebhook(&rootObj);
-    qDebug() << *botwebhook;
+    if(rootObj){
+        auto botwebhook = new BotWebhook(rootObj.get());
+        BOTLOG(*botwebhook);
+    }
 }
 
 void BotNetworkManager::on_GetWebhookDetails(BotNetworkReplyHelper *nrh)
 {
-    QJsonObject rootObj = this->ExtractContect(nrh);
-
-    auto botwebhook = new BotWebhook(&rootObj);
-    qDebug() << *botwebhook;
+    on_CreateWebHook(nrh);
 }
 
 void BotNetworkManager::on_UpdateWebhook(BotNetworkReplyHelper *nrh)
 {
-    QJsonObject rootObj = this->ExtractContect(nrh);
-
-    auto botwebhook = new BotWebhook(&rootObj);
-    qDebug() << *botwebhook;
+    on_CreateWebHook(nrh);
 }
 
 void BotNetworkManager::on_DeleteWebhook(BotNetworkReplyHelper *nrh)
@@ -584,34 +629,22 @@ void BotNetworkManager::on_DeleteWebhook(BotNetworkReplyHelper *nrh)
     this->ExtractContect(nrh);
 }
 
-void BotNetworkManager::SetHeaderAuthorization(std::shared_ptr<QNetworkRequest> request)
-{
-    auto botAccessToken = CONFIG->Value(BotConfig::AccessToken).toByteArray();
-    request->setRawHeader("Authorization", botAccessToken);
-}
-
-std::shared_ptr<QNetworkRequest> BotNetworkManager::NewRequest(const QUrl &url)
-{
-    std::shared_ptr<QNetworkRequest> request(new QNetworkRequest(url));
-    SetHeaderAuthorization(request);
-    return request;
-}
-
 void BotNetworkManager::SendAndConnect(BotNetworkManager::SendType type,
                                        std::shared_ptr<QNetworkRequest> request,
                                        void (BotNetworkManager::*fuc)(BotNetworkReplyHelper *),
-                                       const QJsonObject &jsonObject)
+                                       const QByteArray &data)
 {
+    BOTLOG("Sending Begin!");
     QNetworkReply * reply = nullptr;
     switch(type){
     case SendType::Get:
         reply = networkAccessManager->get(*request);
         break;
     case SendType::Post:
-        reply = networkAccessManager->post(*request, QJsonDocument(jsonObject).toJson());
+        reply = networkAccessManager->post(*request, data);
         break;
     case SendType::Put:
-        reply = networkAccessManager->put(*request, QJsonDocument(jsonObject).toJson());
+        reply = networkAccessManager->put(*request, data);
         break;
     case SendType::Delete:
         reply = networkAccessManager->deleteResource(*request);
@@ -619,28 +652,79 @@ void BotNetworkManager::SendAndConnect(BotNetworkManager::SendType type,
     }
     if(reply)
     {
+        BOTLOG("Sending Succeed!");
         BotNetworkReplyHelper * replyHelper = new BotNetworkReplyHelper(reply);
         connect(replyHelper, &BotNetworkReplyHelper::finished, this, fuc);
+    }else {
+        BOTLOG("Sending failed!");
+    }
+}
+
+void BotNetworkManager::SendAndConnect(BotNetworkManager::SendType type,
+                                       std::shared_ptr<QNetworkRequest> request,
+                                       void (BotNetworkManager::*fuc)(BotNetworkReplyHelper *),
+                                       QHttpMultiPart *data)
+{
+    BOTLOG("Sending Begin!");
+    QNetworkReply * reply = nullptr;
+    switch(type){
+    case SendType::Get:
+        reply = networkAccessManager->get(*request);
+        break;
+    case SendType::Post:
+        reply = networkAccessManager->post(*request, data);
+        break;
+    case SendType::Put:
+        reply = networkAccessManager->put(*request, data);
+        break;
+    case SendType::Delete:
+        reply = networkAccessManager->deleteResource(*request);
+        break;
+    }
+    if(reply)
+    {
+        BOTLOG("Sending Succeed!");
+        if(data){
+            data->setParent(reply);
+        }
+
+        BotNetworkReplyHelper * replyHelper = new BotNetworkReplyHelper(reply);
+        connect(replyHelper, &BotNetworkReplyHelper::finished, this, fuc);
+    }else {
+        BOTLOG("Sending failed!");
     }
 }
 
 
-QJsonObject BotNetworkManager::ExtractContect(BotNetworkReplyHelper *nrh)
+std::shared_ptr<QJsonObject> BotNetworkManager::ExtractContect(BotNetworkReplyHelper *nrh)
 {
     auto reply = nrh->GetNetworkReply();
-    delete nrh;
+
+    auto errorCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+
+    BOTLOG("Reply status:(" + QString::number(errorCode) + "):" << reply->error());
 
     QByteArray data = reply->readAll();
-    qDebug() << reply->error() << reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     reply->deleteLater();
 
     QJsonParseError jsonError;
     QJsonDocument jsonDoc(QJsonDocument::fromJson(data, &jsonError));
+    BOTLOG(QString("Json parsing result:") << jsonError.error);
+    if(jsonError.error != QJsonParseError::ParseError::NoError){
+        return {};
+    }
 
-//    if(jsonError.error != QJsonParseError::NoError)
-//    {
-//        qDebug() << "json error!";
-//        return;
-//    }
-    return jsonDoc.object();
+    if(errorCode == 200){
+        std::shared_ptr<QJsonObject> jsonObjectPtr(new QJsonObject);
+        *jsonObjectPtr = jsonDoc.object();
+        return jsonObjectPtr;
+    } else if (errorCode == 204) {
+        return {};
+    } else {
+        QJsonObject jsonObject = jsonDoc.object();
+        if(jsonObject.contains("message"))
+            BOTLOG(jsonObject.value("message"));
+    }
+
+
 }

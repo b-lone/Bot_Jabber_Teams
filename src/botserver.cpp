@@ -2,7 +2,13 @@
 
 #include <QTcpServer>
 #include <QTcpSocket>
+#include <QJsonDocument>
+#include <QJsonObject>
+
 #include "botconfig.h"
+#include "botcommon.h"
+#include "botnetworkmanager.h"
+#include "botmessage.h"
 
 BotServer *BotServer::Instance()
 {
@@ -13,7 +19,7 @@ BotServer *BotServer::Instance()
 bool BotServer::Listen()
 {
     auto port = static_cast<unsigned short>(CONFIG->Value(BotConfig::ListenPort).toInt());
-    qDebug() << port;
+    BOTLOG("port:" << port);
     return server->listen(QHostAddress::Any, port);
 }
 
@@ -40,7 +46,7 @@ BotServer::BotServer()
 
 void BotServer::on_newConnection()
 {
-    qDebug() << __FUNCTION__;
+    BOTLOG("New Connection!");
     currentClient.reset(server->nextPendingConnection());
     tcpClient.append(currentClient);
 
@@ -50,14 +56,35 @@ void BotServer::on_newConnection()
 
 void BotServer::on_readyRead()
 {
+
     for(int i=0; i<tcpClient.length(); i++)
     {
         QByteArray buffer = tcpClient[i]->readAll();
         if(buffer.isEmpty())
             continue;
 
-        qDebug() << buffer;
+        auto arrayList = buffer.split('\n');
+        auto lastArray = arrayList.end() - 1;
 
+        QJsonParseError jsonError;
+        QJsonDocument jsonDoc(QJsonDocument::fromJson(*lastArray, &jsonError));
+        BOTLOG(QString("Json parsing result:") << jsonError.error);
+        if(jsonError.error != QJsonParseError::ParseError::NoError){
+            return;
+        }
+
+        QJsonObject jsonObject = jsonDoc.object();
+
+        auto dataObject = jsonObject.value("data").toObject();
+        auto roomId = dataObject.value("roomId").toString();
+        auto messageId = dataObject.value("id");
+        BotMessage message;
+        message.roomId = roomId;
+        message.text = "Hi";
+        NETMANAGER->sendCreateMessage(message);
+
+
+        qDebug() << jsonObject;
 //        static QString IP_Port, IP_Port_Pre;
 //        IP_Port = tr("[%1:%2]:").arg(tcpClient[i]->peerAddress().toString().split("::ffff:")[1])\
 //                .arg(tcpClient[i]->peerPort());

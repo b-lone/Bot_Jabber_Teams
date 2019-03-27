@@ -5,7 +5,8 @@
 #include "botconfig.h"
 #include "botserver.h"
 #include "botwebhook.h"
-#include <QDebug>
+#include "botmessage.h"
+#include "botcommon.h"
 
 BotMainWindow::BotMainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -71,9 +72,15 @@ void BotMainWindow::on_btnListDMsg_clicked()
 
 void BotMainWindow::on_btnCreateMsg_clicked()
 {
-    NETMANAGER->sendCreateMessage("Y2lzY29zcGFyazovL3VzL1JPT00vN2NlNzBkODAtNGExMC0xMWU5LTg1OWEtOWQwMGI2ODRlNGI0",
-                                  "Hello World"/*,
-                                  "fengqiuhuang.png"*/);
+    BotMessage message;
+    message.roomId = "Y2lzY29zcGFyazovL3VzL1JPT00vN2NlNzBkODAtNGExMC0xMWU5LTg1OWEtOWQwMGI2ODRlNGI0";
+//    message.toPersonId = "Y2lzY29zcGFyazovL3VzL1BFT1BMRS83ZjNkZmQxZS03ODU3LTRhODgtOWI4OC1jN2VmNDgxODdiZDg";
+//    message.toPersonEmail = "kuyou@cisco.com";
+    message.text = "Hello World";
+    message.markdown = "**Title**";
+//    message.files.append("CMakeFiles/feature_tests.bin");
+    message.files.append("fengqiuhuang.png");
+    NETMANAGER->sendCreateMessage(message);
 }
 
 void BotMainWindow::on_btnGetMsg_clicked()
@@ -89,12 +96,16 @@ void BotMainWindow::on_btnDeleteMsg_clicked()
 void BotMainWindow::on_btnListPeople_clicked()
 {
 //    NETMANAGER->sendListPeople("kuyou@cisco.com");
-    NETMANAGER->sendListPeople("KunYou123@webex.bot");
+//    NETMANAGER->sendListPeople("KunYou123@webex.bot", 0);
+//    NETMANAGER->sendListPeople("Kun You", 1);
+    NETMANAGER->sendListPeople("Y2lzY29zcGFyazovL3VzL1BFT1BMRS83ZjNkZmQxZS03ODU3LTRhODgtOWI4OC1jN2VmNDgxODdiZDg,Y2lzY29zcGFyazovL3VzL1BFT1BMRS9kNWZkNWExNS1mNzJjLTQ1MzgtODZkMS1iYmFiOGEyMWUxOTU,",
+                               2);
 }
 
 void BotMainWindow::on_btnGetPersonDetails_clicked()
 {
     NETMANAGER->sendGetPersonDetails("Y2lzY29zcGFyazovL3VzL1BFT1BMRS8zMDhmNmI4My1hOGFjLTQyNzItYjg5NS03NGIyYzY5NDQ1MTc");
+    NETMANAGER->sendGetPersonDetails("me");
 }
 
 void BotMainWindow::on_btnCreateRoom_clicked()
@@ -140,7 +151,7 @@ void BotMainWindow::on_btnWebhookDetails_clicked()
 
 void BotMainWindow::on_btnUpdateWebhook_clicked()
 {
-    NETMANAGER->sendUpdateWebhook("Y2lzY29zcGFyazovL3VzL1dFQkhPT0svZTUwZThkMTctYzc3Ny00Mjc5LTgwNTctODkwMTU4MzIwYmU0", "test");
+    NETMANAGER->sendUpdateWebhook("Y2lzY29zcGFyazovL3VzL1dFQkhPT0svZTUwZThkMTctYzc3Ny00Mjc5LTgwNTctODkwMTU4MzIwYmU0", "test", "https://6eca506c.ngrok.io");
 }
 
 void BotMainWindow::on_btnDeleteWebhook_clicked()

@@ -4,10 +4,13 @@
 #include <QObject>
 #include <QJsonObject>
 #include <QMap>
+#include <QMetaEnum>
 class QNetworkAccessManager;
 class QNetworkRequest;
 class QNetworkReply;
+class QHttpMultiPart;
 class BotWebhook;
+class BotMessage;
 
 class BotNetworkReplyHelper : public QObject
 {
@@ -32,9 +35,14 @@ class BotNetworkRepquestHelper : public QObject
     Q_OBJECT
 public:
     enum RequestType{
-        Memberships = 0,
-        Messages,
+        memberships = 0,
+        messages,
+        people,
+        rooms,
+        webhooks,
     };
+    Q_ENUM(RequestType)
+
     BotNetworkRepquestHelper(RequestType type);
 
     std::shared_ptr<QNetworkRequest> GennerateRequest();
@@ -106,34 +114,56 @@ public:
     void sendListDirectMessages(QString byString, bool isByEmail = true);
 
     //https://developer.webex.com/docs/api/v1/messages/create-a-message
-    void sendCreateMessage(QString roomId,QString text, QString files = "");
+    //如果同时发送了markdown字段和text字段，text字段将被忽略，并将markdown解释后显示的字段作为text
+    //现在只支持一次发送单个文件
+    void sendCreateMessage(const BotMessage & message);
 
     //https://developer.webex.com/docs/api/v1/messages/get-message-details
     void sendGetMessageDetails(QString messageId);
+
     //https://developer.webex.com/docs/api/v1/messages/delete-a-message
     void sendDeleteMessage(QString messageId);
+
+//---------------People----------------------------------
     //https://developer.webex.com/docs/api/v1/people/list-people
-    void sendListPeople(QString email);
+    //有三种方式，email或者displayName只能提供一个，id一次可以提供不超过85个
+    //byWhat: 0--email,1-displayName,2-id
+    void sendListPeople(QString byString, int byWhat, int max = 100);
+
     //https://developer.webex.com/docs/api/v1/people/get-person-details
     void sendGetPersonDetails(QString personId);
+
+//---------------Rooms----------------------------------
     //https://developer.webex.com/docs/api/v1/rooms/list-rooms
-    void sendListRooms();
+    //type: e.g. group,direct
+    //sortBy: e.g. id, lastactivity, created
+    void sendListRooms(QString type = {}, QString sortBy = {}, int max = 100);
+
     //https://developer.webex.com/docs/api/v1/rooms/create-a-room
     void sendCreateRoom(QString title);
+
     //https://developer.webex.com/docs/api/v1/rooms/get-room-details
     void sendGetRoomDetails(QString roomId);
+
     //https://developer.webex.com/docs/api/v1/rooms/update-a-room
     void sendUpdateRoom(QString roomId, QString title);
+
     //https://developer.webex.com/docs/api/v1/rooms/delete-a-room
     void sendDeleteRoom(QString roomId);
+
+//---------------Webhooks----------------------------------
     //https://developer.webex.com/docs/api/v1/webhooks/list-webhooks
-    void sendListWebhooks();
+    void sendListWebhooks(int max = 100);
+
     //https://developer.webex.com/docs/api/v1/webhooks/create-a-webhook
     void sendCreateWebhook(BotWebhook & webhook);
+
     //https://developer.webex.com/docs/api/v1/webhooks/get-webhook-details
     void sendGetWebhookDetails(QString webhookId);
+
     //https://developer.webex.com/docs/api/v1/webhooks/update-a-webhook
-    void sendUpdateWebhook(QString webhookId, QString name);
+    void sendUpdateWebhook(QString webhookId, QString name, QString targetUrl, QString status = "active");
+
     //https://developer.webex.com/docs/api/v1/webhooks/delete-a-webhook
     void sendDeleteWebhook(QString webhookId);
 
@@ -163,15 +193,19 @@ private slots:
 
 private:
     explicit BotNetworkManager();
-    void SetHeaderAuthorization( std::shared_ptr<QNetworkRequest> request);
-    std::shared_ptr<QNetworkRequest> NewRequest(const QUrl &url);
+
     void SendAndConnect(SendType type,
                         std::shared_ptr<QNetworkRequest> request,
                         void (BotNetworkManager::*fuc)(BotNetworkReplyHelper *),
-                        const QJsonObject & jsonObject = {}
+                        const QByteArray & data
+                        );
+    void SendAndConnect(SendType type,
+                        std::shared_ptr<QNetworkRequest> request,
+                        void (BotNetworkManager::*fuc)(BotNetworkReplyHelper *),
+                        QHttpMultiPart * data = nullptr
                         );
 
-    QJsonObject ExtractContect(BotNetworkReplyHelper * nrh);
+     std::shared_ptr<QJsonObject> ExtractContect(BotNetworkReplyHelper * nrh);
 
 private:
     std::shared_ptr<QNetworkAccessManager> networkAccessManager;

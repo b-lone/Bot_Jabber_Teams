@@ -15,6 +15,7 @@ BotMessage::BotMessage(QJsonObject *jsonObject)
         this->toPersonEmail = jsonObject->value("toPersonEmail").toString();
         this->text = jsonObject->value("text").toString();
         this->markdown = jsonObject->value("markdown").toString();
+        this->html = jsonObject->value("html").toString();
         {
             auto jsonArray = jsonObject->value("files").toArray();
             for (auto sub: jsonArray) {
@@ -52,6 +53,7 @@ QDebug operator <<(QDebug qd, BotMessage &message)
               << "\n    toPersonEmail:" << message.toPersonEmail
               << "\n    text:" << message.text
               << "\n    markdown:" << message.markdown
+              << "\n    html:" << message.html
               << "\n    files:" << message.files
               << "\n    personId:" << message.personId
               << "\n    personEmail:" << message.personEmail

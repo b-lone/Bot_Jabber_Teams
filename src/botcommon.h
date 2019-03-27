@@ -1,6 +1,8 @@
 #ifndef BOTCOMMON_H
 #define BOTCOMMON_H
 
-#define BOTOUT(out) qDebug() << "\"" << __FILE__ << "\"[" << __func__ << "]:" << out
+#include <QDebug>
+
+#define BOTLOG(arg) qDebug() << "[" << __FILE__ << "][" << __LINE__ << "][" << __func__ << "]:" << arg
 
 #endif // BOTCOMMON_H
