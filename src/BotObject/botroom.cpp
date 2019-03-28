@@ -7,22 +7,22 @@ BotRoom::BotRoom(QObject *parent):BotObject (parent)
 {
 }
 
-BotRoom::BotRoom(const QJsonObject jsonObjectPtr)
+BotRoom::BotRoom(QJsonObject *jsonObject)
 {
-   InitFromJson(jsonObjectPtr);
+   InitFromJson(jsonObject);
 }
 
-void BotRoom::InitFromJson(const QJsonObject & jsonObjectPtr)
+void BotRoom::InitFromJson(QJsonObject *jsonObject)
 {
-    this->id = jsonObjectPtr.value("id").toString();
-    this->title = jsonObjectPtr.value("title").toString();
-    this->type = jsonObjectPtr.value("type").toString();
-    this->isLocked = jsonObjectPtr.value("isLocked").toBool();
-    this->teamId = jsonObjectPtr.value("lastActivity").toString();
-    this->lastActivity = jsonObjectPtr.value("lastActivity").toString();
-    this->creatorId = jsonObjectPtr.value("creatorId").toString();
-    this->created = jsonObjectPtr.value("created").toString();
-    this->sipAddress = jsonObjectPtr.value("sipAddress").toString();
+    this->id = jsonObject->value("id").toString();
+    this->title = jsonObject->value("title").toString();
+    this->type = jsonObject->value("type").toString();
+    this->isLocked = jsonObject->value("isLocked").toBool();
+    this->teamId = jsonObject->value("lastActivity").toString();
+    this->lastActivity = jsonObject->value("lastActivity").toString();
+    this->creatorId = jsonObject->value("creatorId").toString();
+    this->created = jsonObject->value("created").toString();
+    this->sipAddress = jsonObject->value("sipAddress").toString();
 
 }
 

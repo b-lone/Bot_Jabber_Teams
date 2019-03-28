@@ -16,6 +16,7 @@
 #include "botpeople.h"
 #include "botwebhook.h"
 #include "botcommon.h"
+#include "botstore.h"
 
 //BotNetworkReplyHelper
 BotNetworkReplyHelper::BotNetworkReplyHelper(QNetworkReply *nr): QObject(nr), networkReply(nr)
@@ -36,7 +37,7 @@ BotNetworkRepquestHelper::BotNetworkRepquestHelper(BotNetworkRepquestHelper::Req
 {
     this->request = std::make_shared<QNetworkRequest>();
 
-    auto botAccessToken = CONFIG->Value(BotConfig::AccessToken).toByteArray();
+    auto botAccessToken = BOTCONFIG->Value(BotConfig::AccessToken).toByteArray();
     request->setRawHeader("Authorization", botAccessToken);
 }
 
@@ -513,7 +514,13 @@ void BotNetworkManager::on_CreateMessage(BotNetworkReplyHelper *nrh)
 
 void BotNetworkManager::on_GetMessageDetails(BotNetworkReplyHelper *nrh)
 {
-    on_CreateMessage(nrh);
+    auto rootObj = this->ExtractContect(nrh);
+
+    if(rootObj){
+        std::shared_ptr<BotMessage> botmessage(new BotMessage(rootObj.get()));
+        BOTLOG(*botmessage);
+        BOTSTORE->AddNewMessage(botmessage);
+    }
 }
 
 void BotNetworkManager::on_DeleteMessage(BotNetworkReplyHelper *nrh)
@@ -552,16 +559,16 @@ void BotNetworkManager::on_ListRooms(BotNetworkReplyHelper *nrh)
 {
     auto rootObj = this->ExtractContect(nrh);
 
-//    if(rootObj.contains("items"))
-//    {
-//        QJsonArray subArray = rootObj.value("items").toArray();
-//        for(int i = 0; i< subArray.size(); i++)
-//        {
-//            QJsonObject subObject = subArray.at(i).toObject();
-//            auto botroom = new BotRoom(subObject);
-//            qDebug() << *botroom;
-//        }
-//    }
+    if(rootObj->contains("items"))
+    {
+        QJsonArray subArray = rootObj->value("items").toArray();
+        for(int i = 0; i< subArray.size(); i++)
+        {
+            QJsonObject subObject = subArray.at(i).toObject();
+            auto botroom = new BotRoom(&subObject);
+            qDebug() << *botroom;
+        }
+    }
 }
 
 void BotNetworkManager::on_CreateRoom(BotNetworkReplyHelper *nrh)
@@ -573,8 +580,8 @@ void BotNetworkManager::on_GetRoomDetails(BotNetworkReplyHelper *nrh)
 {
     auto rootObj = this->ExtractContect(nrh);
 
-//    auto botroom = new BotRoom(rootObj);
-//    qDebug() << *botroom;
+    auto botroom = new BotRoom(rootObj.get());
+    qDebug() << *botroom;
 }
 
 void BotNetworkManager::on_UpdateRoom(BotNetworkReplyHelper *nrh)

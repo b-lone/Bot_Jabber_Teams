@@ -3,6 +3,8 @@
 
 const QString BotConfig::AccessToken = "bot/Access Token";
 const QString BotConfig::ListenPort = "local/Listen Port";
+const QString BotConfig::BotId = "bot/id";
+const QString BotConfig::BotDisplayName = "bot/displayName";
 
 BotConfig *BotConfig::Instance()
 {

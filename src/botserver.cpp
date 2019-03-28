@@ -9,6 +9,8 @@
 #include "botcommon.h"
 #include "botnetworkmanager.h"
 #include "botmessage.h"
+#include "botstore.h"
+#include "botconfig.h"
 
 BotServer *BotServer::Instance()
 {
@@ -18,7 +20,7 @@ BotServer *BotServer::Instance()
 
 bool BotServer::Listen()
 {
-    auto port = static_cast<unsigned short>(CONFIG->Value(BotConfig::ListenPort).toInt());
+    auto port = static_cast<unsigned short>(BOTCONFIG->Value(BotConfig::ListenPort).toInt());
     BOTLOG("port:" << port);
     return server->listen(QHostAddress::Any, port);
 }
@@ -42,6 +44,32 @@ BotServer::BotServer()
 {
     server = std::make_shared<QTcpServer>();
     connect(server.get(), &QTcpServer::newConnection, this, &BotServer::on_newConnection);
+    connect(BOTSTORE, &BotStore::NewMessage, this, &BotServer::OnNewMessage);
+}
+
+void BotServer::OnNewMessage(std::shared_ptr<BotMessage> message)
+{
+    for (int i = 0; i< messageIds.length(); ++i) {
+        if(messageIds[i] == message->id){
+            BotMessage msgForSend;
+            msgForSend.roomId = message->roomId;
+
+            auto text = message->text;
+            if(message->roomType == "group"){
+                auto displayName = BOTCONFIG->Value(BotConfig::BotDisplayName).toString();
+                text = message->text.mid(displayName.count());
+            }
+            if(text.contains("picture")){// remove(' ') == "sendmepicture"){
+                msgForSend.files.push_back("fengqiuhuang.png");
+            }else {
+                msgForSend.text = text;
+            }
+
+
+            NETMANAGER->sendCreateMessage(msgForSend);
+            messageIds.removeAll(message->id);
+        }
+    }
 }
 
 void BotServer::on_newConnection()
@@ -70,25 +98,26 @@ void BotServer::on_readyRead()
         QJsonDocument jsonDoc(QJsonDocument::fromJson(*lastArray, &jsonError));
         BOTLOG(QString("Json parsing result:") << jsonError.error);
         if(jsonError.error != QJsonParseError::ParseError::NoError){
-            return;
+            continue;
         }
 
         QJsonObject jsonObject = jsonDoc.object();
 
         auto dataObject = jsonObject.value("data").toObject();
+        BOTLOG(dataObject);
+        auto personId = dataObject.value("personId").toString();
+        if(personId == BOTCONFIG->Value(BotConfig::BotId)){
+            BOTLOG("My message!");
+            continue;
+        }
+
+
         auto roomId = dataObject.value("roomId").toString();
-        auto messageId = dataObject.value("id");
-        BotMessage message;
-        message.roomId = roomId;
-        message.text = "Hi";
-        NETMANAGER->sendCreateMessage(message);
+        auto messageId = dataObject.value("id").toString();
+        messageIds.push_back(messageId);
 
-
-        qDebug() << jsonObject;
-//        static QString IP_Port, IP_Port_Pre;
-//        IP_Port = tr("[%1:%2]:").arg(tcpClient[i]->peerAddress().toString().split("::ffff:")[1])\
-//                .arg(tcpClient[i]->peerPort());
-
+        NETMANAGER->sendGetMessageDetails(messageId);
+        continue;
     }
 }
 void BotServer::on_disconnected()

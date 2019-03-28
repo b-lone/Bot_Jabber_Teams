@@ -3,9 +3,11 @@
 
 #include <QObject>
 #include <QList>
+#include <QVector>
 
 class QTcpServer;
 class QTcpSocket;
+class BotMessage;
 
 class BotServer : public QObject
 {
@@ -17,6 +19,9 @@ public:
 private:
     BotServer();
 
+public slots:
+    void OnNewMessage(std::shared_ptr<BotMessage> message);
+
 private slots:
     void on_newConnection();
     void on_readyRead();
@@ -26,6 +31,8 @@ private:
     std::shared_ptr<QTcpServer> server;
     QList<std::shared_ptr<QTcpSocket>> tcpClient;
     std::shared_ptr<QTcpSocket> currentClient;
+
+    QVector<QString> messageIds;
 };
 
 #define SERVER BotServer::Instance()

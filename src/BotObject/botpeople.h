@@ -1,6 +1,7 @@
 #ifndef BOTPEOPLE_H
 #define BOTPEOPLE_H
 
+#include <mutex>
 #include <QVector>
 #include <QStringList>
 class QJsonObject;
@@ -16,6 +17,7 @@ class BotPeople
 {
 public:
     //init by json
+    BotPeople() = default;
     BotPeople(QJsonObject *jsonObject);
 
     friend QDebug operator <<(QDebug os, BotPeople & people);
@@ -38,6 +40,7 @@ public:
     QString invitePending;
     QString loginEnabled;
     QString type;
+
 };
 
 QDebug operator <<(QDebug qd, BotPeople & people);

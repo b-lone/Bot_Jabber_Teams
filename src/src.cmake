@@ -1,3 +1,5 @@
+include_directories(${PROJECT_SRC_PATH})
+
 set(SRC_OBJ_PATH ${PROJECT_SRC_PATH}/BotObject)
 include_directories(${SRC_OBJ_PATH})
 include(${SRC_OBJ_PATH}/object.cmake)

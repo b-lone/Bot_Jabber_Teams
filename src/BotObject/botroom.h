@@ -9,9 +9,9 @@ class BotRoom : public BotObject
 public:
     //init by json
     BotRoom(QObject *parent = nullptr);
-    BotRoom(const QJsonObject  jsonObjectPtr);
+    BotRoom(QJsonObject  * jsonObject);
 
-    void InitFromJson(const QJsonObject & jsonObjectPtr);
+    void InitFromJson(QJsonObject * jsonObject);
 
     //title
     void setTitle(const QString & Title){ title = Title; }
@@ -19,6 +19,7 @@ public:
     //type
     void setType(const QString & Type){ type = Type; }
     const QString & getType(){ return type; }
+
     //isLocked
     void Locked(bool islock = true);
 

@@ -12,6 +12,8 @@ public:
 
     static const QString AccessToken;
     static const QString ListenPort;
+    static const QString BotId;
+    static const QString BotDisplayName;
 
     QVariant Value(const QString & key);
     void SetValue(const QString & key, const QVariant & value);
@@ -20,6 +22,6 @@ private:
     std::shared_ptr<QSettings> settings;
 };
 
-#define CONFIG BotConfig::Instance()
+#define BOTCONFIG BotConfig::Instance()
 
 #endif // BOTCONFIG_H
