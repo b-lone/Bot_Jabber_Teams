@@ -1,10 +1,11 @@
 #include "botconfig.h"
 #include <QSettings>
 
-const QString BotConfig::AccessToken = "bot/Access Token";
-const QString BotConfig::ListenPort = "local/Listen Port";
+const QString BotConfig::BotAccessToken = "bot/Access Token";
 const QString BotConfig::BotId = "bot/id";
 const QString BotConfig::BotDisplayName = "bot/displayName";
+const QString BotConfig::ngrokPort = "ngrok/port";
+const QString BotConfig::ngrokSubdomain = "ngrok/subdomain";
 
 BotConfig *BotConfig::Instance()
 {

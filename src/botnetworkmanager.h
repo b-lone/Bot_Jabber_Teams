@@ -76,6 +76,7 @@ public:
     };
 
     static BotNetworkManager * Instance();
+    void sendGetNgrokInfo();
 //---------------Memberships----------------------------------
     //https://developer.webex.com/docs/api/v1/memberships/list-memberships
     //1.默认查询列出本人加入的room的本人的memberships，即加入几个room就会有几个结果返回
@@ -168,6 +169,7 @@ public:
     void sendDeleteWebhook(QString webhookId);
 
 private slots:
+    void on_GetNgrokInfo(BotNetworkReplyHelper * nrh);
     void on_GetMemberships(BotNetworkReplyHelper * nrh);
     void on_CreateAMembership(BotNetworkReplyHelper * nrh);
     void on_GetMembership(BotNetworkReplyHelper * nrh);

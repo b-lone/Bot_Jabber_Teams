@@ -37,7 +37,7 @@ BotNetworkRepquestHelper::BotNetworkRepquestHelper(BotNetworkRepquestHelper::Req
 {
     this->request = std::make_shared<QNetworkRequest>();
 
-    auto botAccessToken = BOTCONFIG->Value(BotConfig::AccessToken).toByteArray();
+    auto botAccessToken = BOTCONFIG->Value(BotConfig::BotAccessToken).toByteArray();
     request->setRawHeader("Authorization", botAccessToken);
 }
 
@@ -94,6 +94,17 @@ BotNetworkManager *BotNetworkManager::Instance()
 {
     static BotNetworkManager * botNetworkManager = new BotNetworkManager();
     return botNetworkManager;
+}
+
+void BotNetworkManager::sendGetNgrokInfo()
+{
+    QNetworkRequest request(QUrl("http://localhost:4040/api/tunnels"));
+    request.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader,"application/json");
+
+    auto reply = networkAccessManager->get(request);
+    BotNetworkReplyHelper * replyHelper = new BotNetworkReplyHelper(reply);
+    connect(replyHelper, &BotNetworkReplyHelper::finished, this, &BotNetworkManager::on_GetNgrokInfo);
+
 }
 
 void BotNetworkManager::sendGetMemberships(QString roomId, QString filterString, bool isFilterByPersonId)
@@ -437,6 +448,31 @@ void BotNetworkManager::sendDeleteWebhook(QString webhookId)
     SendAndConnect(SendType::Delete, request, &BotNetworkManager::on_DeleteWebhook);
 }
 
+void BotNetworkManager::on_GetNgrokInfo(BotNetworkReplyHelper *nrh)
+{
+    auto rootObj = this->ExtractContect(nrh);
+    BOTLOG(rootObj->value("url").toString());
+//    BOTLOG(*rootObj);
+    {
+        auto tunnelsObj = rootObj->value("tunnels").toArray();
+        for (auto tunnel: tunnelsObj) {
+            auto tunnelObj = tunnel.toObject();
+            if(tunnelObj.value("proto").toString() == "https"){
+                auto sURl = tunnelObj.value("public_url").toString();
+
+                BOTLOG("Creat new webhook!");
+                BotWebhook webhook;
+                webhook.name = "Kun You";
+                webhook.targetUrl = sURl;
+                webhook.resource = "messages";
+                webhook.event = "created";
+
+                this->sendCreateWebhook(webhook);
+            }
+        }
+    }
+}
+
 void BotNetworkManager::on_GetMemberships(BotNetworkReplyHelper *nrh)
 {
     auto rootObj = this->ExtractContect(nrh);
@@ -519,7 +555,7 @@ void BotNetworkManager::on_GetMessageDetails(BotNetworkReplyHelper *nrh)
     if(rootObj){
         std::shared_ptr<BotMessage> botmessage(new BotMessage(rootObj.get()));
         BOTLOG(*botmessage);
-        BOTSTORE->AddNewMessage(botmessage);
+        BOTSTORE->PushMessage(botmessage);
     }
 }
 
@@ -616,19 +652,30 @@ void BotNetworkManager::on_CreateWebHook(BotNetworkReplyHelper *nrh)
     auto rootObj = this->ExtractContect(nrh);
 
     if(rootObj){
-        auto botwebhook = new BotWebhook(rootObj.get());
+        std::shared_ptr<BotWebhook> botwebhook(new BotWebhook(rootObj.get()));
         BOTLOG(*botwebhook);
+        BOTSTORE->PushWebhook(botwebhook);
     }
 }
 
 void BotNetworkManager::on_GetWebhookDetails(BotNetworkReplyHelper *nrh)
 {
-    on_CreateWebHook(nrh);
+    auto rootObj = this->ExtractContect(nrh);
+
+    if(rootObj){
+        auto botwebhook = new BotWebhook(rootObj.get());
+        BOTLOG(*botwebhook);
+    }
 }
 
 void BotNetworkManager::on_UpdateWebhook(BotNetworkReplyHelper *nrh)
 {
-    on_CreateWebHook(nrh);
+    auto rootObj = this->ExtractContect(nrh);
+
+    if(rootObj){
+        auto botwebhook = new BotWebhook(rootObj.get());
+        BOTLOG(*botwebhook);
+    }
 }
 
 void BotNetworkManager::on_DeleteWebhook(BotNetworkReplyHelper *nrh)
@@ -730,8 +777,7 @@ std::shared_ptr<QJsonObject> BotNetworkManager::ExtractContect(BotNetworkReplyHe
     } else {
         QJsonObject jsonObject = jsonDoc.object();
         if(jsonObject.contains("message"))
-            BOTLOG(jsonObject.value("message"));
+            BOTLOG(jsonObject.value("message"));      
     }
-
-
+    return {};
 }

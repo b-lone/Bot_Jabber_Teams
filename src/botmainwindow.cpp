@@ -1,5 +1,8 @@
 #include "botmainwindow.h"
 #include "ui_botmainwindow.h"
+#include <QProcess>
+#include <QMessageBox>
+#include <QThread>
 
 #include "botnetworkmanager.h"
 #include "botconfig.h"
@@ -13,12 +16,54 @@ BotMainWindow::BotMainWindow(QWidget *parent) :
     ui(new Ui::BotMainWindow)
 {
     ui->setupUi(this);
-    qDebug() << SERVER->Listen();
+    runNgrok();
+    BOTSERVER->Listen();
 }
 
 BotMainWindow::~BotMainWindow()
 {
+    if(ngrok){
+        ngrok->kill();
+        BOTLOG("Kill ngrok:" << ngrok->state());
+//        while(ngrok->state() != QProcess::ProcessState::NotRunning)
+//            QThread::sleep(1);
+    }
     delete ui;
+}
+
+void BotMainWindow::runNgrok()
+{
+    if(!ngrok){
+        ngrok = new QProcess;
+        QObject::connect(ngrok, &QProcess::started, this, &BotMainWindow::on_start);
+        QObject::connect(ngrok, &QProcess::errorOccurred, this, &BotMainWindow::on_errorOccurred);
+    }
+    if(!ngrok->isOpen()){
+        BOTLOG("Start ngrok.");
+        QString ngrokPath = QApplication::applicationDirPath() + "/ngrok/ngrok";
+        QStringList args;
+        args << "http";
+        args << BOTCONFIG->Value(BotConfig::ngrokPort).toString();
+        BOTLOG(args);
+        ngrok->start(ngrokPath, args, QProcess::OpenModeFlag::ReadWrite);
+        ngrok->start(ngrokPath);
+        ngrok->waitForStarted();
+    }
+}
+
+void BotMainWindow::on_start()
+{
+    BOTLOG("Start ngrok sucessful!");
+}
+
+void BotMainWindow::on_errorOccurred()
+{
+    BOTLOG("Start ngrok failed:" << ngrok->error());
+    auto msgBox = new QMessageBox(this);
+    msgBox->setText("Start ngrok failed!");
+    msgBox->setModal(true);
+    msgBox->show();
+
 }
 
 void BotMainWindow::on_btnRooms_clicked()
@@ -157,4 +202,9 @@ void BotMainWindow::on_btnUpdateWebhook_clicked()
 void BotMainWindow::on_btnDeleteWebhook_clicked()
 {
     NETMANAGER->sendDeleteWebhook("Y2lzY29zcGFyazovL3VzL1dFQkhPT0svZWMxZTFhYTQtZjA3NS00MjE3LTkzODUtZDA4M2ZjY2VhNTBi");
+}
+
+void BotMainWindow::on_btnNgrok_clicked()
+{
+    NETMANAGER->sendGetNgrokInfo();
 }

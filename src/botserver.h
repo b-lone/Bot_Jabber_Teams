@@ -35,6 +35,6 @@ private:
     QVector<QString> messageIds;
 };
 
-#define SERVER BotServer::Instance()
+#define BOTSERVER BotServer::Instance()
 
 #endif // BOTSERVER_H

@@ -10,10 +10,11 @@ class BotConfig
 public:
     static BotConfig * Instance();
 
-    static const QString AccessToken;
-    static const QString ListenPort;
+    static const QString BotAccessToken;
     static const QString BotId;
     static const QString BotDisplayName;
+    static const QString ngrokPort;
+    static const QString ngrokSubdomain;
 
     QVariant Value(const QString & key);
     void SetValue(const QString & key, const QVariant & value);

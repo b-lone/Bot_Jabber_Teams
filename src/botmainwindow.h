@@ -2,6 +2,7 @@
 #define BOTMAINWINDOW_H
 
 #include <QMainWindow>
+class QProcess;
 
 namespace Ui {
 class BotMainWindow;
@@ -14,8 +15,15 @@ class BotMainWindow : public QMainWindow
 public:
     explicit BotMainWindow(QWidget *parent = nullptr);
     ~BotMainWindow();
+private:
+    void runNgrok();
 
-private slots:
+public slots:
+    //ngrok Progress slot
+    void on_start();
+    void on_errorOccurred();
+
+private slots:  
     void on_btnRooms_clicked();
 
     void on_btnMemberships_clicked();
@@ -60,8 +68,11 @@ private slots:
 
     void on_btnDeleteWebhook_clicked();
 
+    void on_btnNgrok_clicked();
+
 private:
     Ui::BotMainWindow *ui;
+    QProcess * ngrok;
 };
 
 #endif // BOTMAINWINDOW_H

@@ -1,4 +1,6 @@
+#include <thread>
 #include <QApplication>
+#include <QProcess>
 
 #include "botmainwindow.h"
 

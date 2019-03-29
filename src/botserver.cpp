@@ -20,7 +20,7 @@ BotServer *BotServer::Instance()
 
 bool BotServer::Listen()
 {
-    auto port = static_cast<unsigned short>(BOTCONFIG->Value(BotConfig::ListenPort).toInt());
+    auto port = static_cast<unsigned short>(BOTCONFIG->Value(BotConfig::ngrokPort).toInt());
     BOTLOG("port:" << port);
     return server->listen(QHostAddress::Any, port);
 }
@@ -44,7 +44,7 @@ BotServer::BotServer()
 {
     server = std::make_shared<QTcpServer>();
     connect(server.get(), &QTcpServer::newConnection, this, &BotServer::on_newConnection);
-    connect(BOTSTORE, &BotStore::NewMessage, this, &BotServer::OnNewMessage);
+    connect(BOTSTORE, &BotStore::MessageReady, this, &BotServer::OnNewMessage);
 }
 
 void BotServer::OnNewMessage(std::shared_ptr<BotMessage> message)
@@ -60,7 +60,7 @@ void BotServer::OnNewMessage(std::shared_ptr<BotMessage> message)
                 text = message->text.mid(displayName.count());
             }
             if(text.contains("picture")){// remove(' ') == "sendmepicture"){
-                msgForSend.files.push_back("fengqiuhuang.png");
+                msgForSend.files.push_back("picture/hello.png");
             }else {
                 msgForSend.text = text;
             }
