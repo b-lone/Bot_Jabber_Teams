@@ -6,6 +6,7 @@ const QString BotConfig::BotId = "bot/id";
 const QString BotConfig::BotDisplayName = "bot/displayName";
 const QString BotConfig::ngrokPort = "ngrok/port";
 const QString BotConfig::ngrokSubdomain = "ngrok/subdomain";
+const QString BotConfig::automationPort = "automation/port";
 
 BotConfig *BotConfig::Instance()
 {
