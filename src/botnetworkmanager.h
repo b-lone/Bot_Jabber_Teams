@@ -2,6 +2,7 @@
 #define BOTNETWORKMANAGER_H
 
 #include <QObject>
+#include <memory>
 #include <QJsonObject>
 #include <QMap>
 #include <QMetaEnum>

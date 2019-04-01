@@ -1,8 +1,10 @@
 #ifndef BOTCONFIG_H
 #define BOTCONFIG_H
 
+#include <memory>
 #include <QString>
 #include <QVariant>
+
 
 class QSettings;
 class BotConfig

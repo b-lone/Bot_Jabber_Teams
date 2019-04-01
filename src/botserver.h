@@ -2,6 +2,7 @@
 #define BOTSERVER_H
 
 #include <QObject>
+#include <memory>
 #include <QList>
 #include <QVector>
 
@@ -31,6 +32,7 @@ private:
 
 class BotServer : public QObject
 {
+    Q_OBJECT
 public:
     static BotServer * Instance();
     bool Listen();

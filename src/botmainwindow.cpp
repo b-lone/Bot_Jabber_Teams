@@ -3,6 +3,7 @@
 #include <QProcess>
 #include <QMessageBox>
 #include <QThread>
+#include <QSysInfo>
 
 #include "botnetworkmanager.h"
 #include "botconfig.h"
@@ -40,7 +41,15 @@ void BotMainWindow::runNgrok()
     }
     if(!ngrok->isOpen()){
         BOTLOG("Start ngrok.");
-        QString ngrokPath = QApplication::applicationDirPath() + "/ngrok/ngrok";
+        auto os = QSysInfo().productType();
+        QString ngrokPath;
+        BOTLOG(os);
+        if(os.contains("win")){
+            ngrokPath = QApplication::applicationDirPath() + "/ngrok/ngrok.exe";
+        }
+        else {
+            ngrokPath = QApplication::applicationDirPath() + "/ngrok/ngrok";
+        }
         QStringList args;
         args << "http";
         args << BOTCONFIG->Value(BotConfig::ngrokPort).toString();

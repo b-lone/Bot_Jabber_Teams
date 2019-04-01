@@ -72,7 +72,7 @@ private slots:
 
 private:
     Ui::BotMainWindow *ui;
-    QProcess * ngrok;
+    QProcess * ngrok = nullptr;
 };
 
 #endif // BOTMAINWINDOW_H

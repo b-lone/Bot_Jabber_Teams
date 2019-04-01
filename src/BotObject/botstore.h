@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <vector>
+#include <memory>
 
 class BotRoom;
 class BotMessage;

@@ -1,6 +1,7 @@
 #ifndef BOTWEBHOOK_H
 #define BOTWEBHOOK_H
 
+#include <memory>
 #include <QString>
 class QJsonObject;
 //class QDebug;
