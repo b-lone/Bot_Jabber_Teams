@@ -5,6 +5,7 @@ project(Bot)
 set(PROJECT_ROOT_PATH "${CMAKE_SOURCE_DIR}")
 set(PROJECT_OUTPUT_PARH "${PROJECT_ROOT_PATH}/bin")
 set(PROJECT_SRC_PATH "${PROJECT_ROOT_PATH}/src")
+set(PROJECT_LIB_PATH "${PROJECT_ROOT_PATH}/lib")
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_ROOT_PATH}/bin/Debug")
 elseif(CMAKE_BUILD_TYPE MATCHES "Release")
@@ -18,10 +19,11 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 find_package(Qt5 COMPONENTS Widgets Network REQUIRED)
-#find_package(QT5 REQUIRED QtCore QtGui COMPONENTS Widgets)
+find_package(OpenSSL REQUIRED)
+message("openssl:${OPENSSL_FOUND}")
 
-#include(${QT_USE_FILE})
 
+#include(${PROJECT_LIB_PATH}/lib.cmake)
 include(${PROJECT_SRC_PATH}/src.cmake)
 
 #add_library(BotObject STATIC ${OBJ_SRC} ${OBJ_HEAD})
@@ -31,9 +33,13 @@ include(${PROJECT_SRC_PATH}/src.cmake)
 #include_directories(lib/include)
 
 add_executable(${PROJECT_NAME} ${SRC_FILES} ${HEAD_FILES} ${RESOURCES_FILES} ${UI_FILES})
+
+include_directories(${OPENSSL_INCLUDE_DIR})
 target_link_libraries(${PROJECT_NAME}
 Qt5::Widgets
 Qt5::Network
+OpenSSL::SSL
+OpenSSL::Crypto
 )
 
 file(COPY "${PROJECT_ROOT_PATH}/config" DESTINATION "${PROJECT_OUTPUT_PARH}/Debug")

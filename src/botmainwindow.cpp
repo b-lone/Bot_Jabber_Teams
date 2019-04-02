@@ -47,7 +47,7 @@ void BotMainWindow::runNgrok()
         if(os.contains("win")){
             ngrokPath = QApplication::applicationDirPath() + "/ngrok/ngrok.exe";
         }
-        else {
+        else if (os == "osx") {
             ngrokPath = QApplication::applicationDirPath() + "/ngrok/ngrok";
         }
         QStringList args;

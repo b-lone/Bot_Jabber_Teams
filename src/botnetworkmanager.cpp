@@ -451,7 +451,13 @@ void BotNetworkManager::sendDeleteWebhook(QString webhookId)
 void BotNetworkManager::on_GetNgrokInfo(BotNetworkReplyHelper *nrh)
 {
     auto rootObj = this->ExtractContect(nrh);
-    BOTLOG(rootObj->value("url").toString());
+    BOTLOG(* rootObj);
+    if(rootObj->contains("uri")){
+        BOTLOG(rootObj->value("uri").toString());
+    }else {
+        BOTLOG("Error in get ngrok info!");
+        return;
+    }
 //    BOTLOG(*rootObj);
     {
         auto tunnelsObj = rootObj->value("tunnels").toArray();
@@ -460,7 +466,7 @@ void BotNetworkManager::on_GetNgrokInfo(BotNetworkReplyHelper *nrh)
             if(tunnelObj.value("proto").toString() == "https"){
                 auto sURl = tunnelObj.value("public_url").toString();
 
-                BOTLOG("Creat new webhook!");
+                BOTLOG("Creat new webhook:" << sURl);
                 BotWebhook webhook;
                 webhook.name = "Kun You";
                 webhook.targetUrl = sURl;
