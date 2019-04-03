@@ -46,15 +46,15 @@ public slots:
 
 private slots:
     void on_newConnectionNgrok();
-    void on_readyReadNgrok(BotTcpSocketHelper * nrh);
-    void on_disconnectedNgrok(BotTcpSocketHelper * nrh);
+    void on_readyReadNgrok();
+    void on_disconnectedNgrok();
 
     void on_newConnectionAutomation();
     void on_readyReadAutomation(BotTcpSocketHelper * nrh);
     void on_disconnectedAutomation(BotTcpSocketHelper * nrh);
 private:
     std::shared_ptr<QTcpServer> serverNgrok;
-    QList<std::shared_ptr<QTcpSocket>> tcpClientNgrok;
+    QList<QTcpSocket*> tcpClientNgrok;
 
     QVector<QString> messageIds;
 

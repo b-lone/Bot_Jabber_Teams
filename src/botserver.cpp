@@ -98,6 +98,7 @@ BotServer::BotServer()
 
 void BotServer::OnNewMessage(std::shared_ptr<BotMessage> message)
 {
+    BOTLOG("New Message");
     for (int i = 0; i< messageIds.length(); ++i) {
         if(messageIds[i] == message->id){
             BotMessage msgForSend;
@@ -124,60 +125,100 @@ void BotServer::OnNewMessage(std::shared_ptr<BotMessage> message)
 void BotServer::on_newConnectionNgrok()
 {
     BOTLOG("New Connection!");
-    std::shared_ptr<QTcpSocket> currentClient(serverNgrok->nextPendingConnection());
+//    std::shared_ptr<QTcpSocket> currentClient(serverNgrok->nextPendingConnection());
+//    tcpClientNgrok.append(currentClient);
+
+//    BotTcpSocketHelper * tsh = new BotTcpSocketHelper(currentClient.get());;
+//    connect(tsh, &BotTcpSocketHelper::readyRead, this, &BotServer::on_readyReadNgrok);
+//    connect(tsh, &BotTcpSocketHelper::disconnected, this, &BotServer::on_disconnectedNgrok);
+    auto currentClient = serverNgrok->nextPendingConnection();
     tcpClientNgrok.append(currentClient);
 
-    BotTcpSocketHelper * tsh = new BotTcpSocketHelper(currentClient.get());
-    connect(tsh, &BotTcpSocketHelper::readyRead, this, &BotServer::on_readyReadNgrok);
-    connect(tsh, &BotTcpSocketHelper::disconnected, this, &BotServer::on_disconnectedNgrok);
+    connect(currentClient, &QTcpSocket::readyRead, this, &BotServer::on_readyReadNgrok);
+    connect(currentClient, &QTcpSocket::disconnected, this, &BotServer::on_disconnectedNgrok);
 }
 
-void BotServer::on_readyReadNgrok(BotTcpSocketHelper *nrh)
+void BotServer::on_readyReadNgrok()
 {
-    auto tcpClient = nrh->GetTcpSocket();
+    BOTLOG("New Webhook Push.");
 
-    QByteArray buffer = tcpClient->readAll();
-    if(buffer.isEmpty())
-        return;
+    for (int i = 0; i < tcpClientNgrok.count(); ++i) {
+        QByteArray buffer = tcpClientNgrok[i]->readAll();
+        if(buffer.isEmpty())
+            continue;
 
-    auto arrayList = buffer.split('\n');
-    auto lastArray = arrayList.end() - 1;
+        auto arrayList = buffer.split('\n');
+        auto lastArray = arrayList.end() - 1;
 
-    QJsonParseError jsonError;
-    QJsonDocument jsonDoc(QJsonDocument::fromJson(*lastArray, &jsonError));
-    BOTLOG(QString("Json parsing result:") << jsonError.error);
-    if(jsonError.error != QJsonParseError::ParseError::NoError){
-        return;
+        QJsonParseError jsonError;
+        QJsonDocument jsonDoc(QJsonDocument::fromJson(*lastArray, &jsonError));
+        BOTLOG(QString("Json parsing result:") << jsonError.error);
+        if(jsonError.error != QJsonParseError::ParseError::NoError){
+            return;
+        }
+
+        QJsonObject jsonObject = jsonDoc.object();
+
+        auto dataObject = jsonObject.value("data").toObject();
+        BOTLOG(dataObject);
+        auto personId = dataObject.value("personId").toString();
+        if(personId == BOTCONFIG->Value(BotConfig::BotId)){
+            BOTLOG("My message!");
+            return;
+        }else {
+            auto roomId = dataObject.value("roomId").toString();
+            auto messageId = dataObject.value("id").toString();
+            messageIds.push_back(messageId);
+
+            NETMANAGER->sendGetMessageDetails(messageId);
+        }
     }
+//    auto tcpClient = nrh->GetTcpSocket();
+//    BOTLOG("1");
 
-    QJsonObject jsonObject = jsonDoc.object();
+//    QByteArray buffer = tcpClient->readAll();
+//    if(buffer.isEmpty())
+//        return;
 
-    auto dataObject = jsonObject.value("data").toObject();
-    BOTLOG(dataObject);
-    auto personId = dataObject.value("personId").toString();
-    if(personId == BOTCONFIG->Value(BotConfig::BotId)){
-        BOTLOG("My message!");
-        return;
-    }else {
-        auto roomId = dataObject.value("roomId").toString();
-        auto messageId = dataObject.value("id").toString();
-        messageIds.push_back(messageId);
+//    auto arrayList = buffer.split('\n');
+//    auto lastArray = arrayList.end() - 1;
 
-        NETMANAGER->sendGetMessageDetails(messageId);
-    }
+//    QJsonParseError jsonError;
+//    QJsonDocument jsonDoc(QJsonDocument::fromJson(*lastArray, &jsonError));
+//    BOTLOG(QString("Json parsing result:") << jsonError.error);
+//    if(jsonError.error != QJsonParseError::ParseError::NoError){
+//        return;
+//    }
+
+//    QJsonObject jsonObject = jsonDoc.object();
+
+//    auto dataObject = jsonObject.value("data").toObject();
+//    BOTLOG(dataObject);
+//    auto personId = dataObject.value("personId").toString();
+//    if(personId == BOTCONFIG->Value(BotConfig::BotId)){
+//        BOTLOG("My message!");
+//        return;
+//    }else {
+//        auto roomId = dataObject.value("roomId").toString();
+//        auto messageId = dataObject.value("id").toString();
+//        messageIds.push_back(messageId);
+
+//        NETMANAGER->sendGetMessageDetails(messageId);
+//    }
 
 }
-void BotServer::on_disconnectedNgrok(BotTcpSocketHelper * nrh)
+void BotServer::on_disconnectedNgrok()
 {
-    tcpClientNgrok.removeOne(nrh->GetTcpSocket());
-//    for(int i=0; i<tcpClientNgrok.length(); i++)
-//    {
-//        if(tcpClientNgrok[i]->state() == QAbstractSocket::UnconnectedState)
-//        {
-//            // 删除存储在tcpClient列表中的客户端信息
-//            tcpClientNgrok.removeAt(i);
-//        }
-    //    }
+    BOTLOG("disconnected.");
+//    tcpClientNgrok.removeOne(nrh->GetTcpSocket());
+    for(int i=0; i<tcpClientNgrok.length(); i++)
+    {
+        if(tcpClientNgrok[i]->state() == QAbstractSocket::UnconnectedState)
+        {
+            // 删除存储在tcpClient列表中的客户端信息
+            tcpClientNgrok.removeAt(i);
+        }
+    }
 }
 
 void BotServer::on_newConnectionAutomation()

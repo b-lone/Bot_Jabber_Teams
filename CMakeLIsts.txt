@@ -19,8 +19,6 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 find_package(Qt5 COMPONENTS Widgets Network REQUIRED)
-find_package(OpenSSL REQUIRED)
-message("openssl:${OPENSSL_FOUND}")
 
 
 #include(${PROJECT_LIB_PATH}/lib.cmake)
@@ -34,21 +32,30 @@ include(${PROJECT_SRC_PATH}/src.cmake)
 
 add_executable(${PROJECT_NAME} ${SRC_FILES} ${HEAD_FILES} ${RESOURCES_FILES} ${UI_FILES})
 
-include_directories(${OPENSSL_INCLUDE_DIR})
+#include_directories(${OpenSLL_Include})
+#link_directories(${OpenSLL_Lib})
 target_link_libraries(${PROJECT_NAME}
 Qt5::Widgets
 Qt5::Network
-OpenSSL::SSL
-OpenSSL::Crypto
+#${OpenSLL_Bin}/libeay32.dll
+#${OpenSLL_Bin}/ssleay32.dll
 )
+include(${PROJECT_ROOT_PATH}/Macro.cmake)
 
-file(COPY "${PROJECT_ROOT_PATH}/config" DESTINATION "${PROJECT_OUTPUT_PARH}/Debug")
-file(COPY "${PROJECT_ROOT_PATH}/config" DESTINATION "${PROJECT_OUTPUT_PARH}/Release")
-file(COPY "${PROJECT_ROOT_PATH}/config" DESTINATION "${PROJECT_OUTPUT_PARH}/Wrap")
-file(COPY "${PROJECT_ROOT_PATH}/ngrok" DESTINATION "${PROJECT_OUTPUT_PARH}/Debug")
-file(COPY "${PROJECT_ROOT_PATH}/ngrok" DESTINATION "${PROJECT_OUTPUT_PARH}/Release")
-file(COPY "${PROJECT_ROOT_PATH}/ngrok" DESTINATION "${PROJECT_OUTPUT_PARH}/Wrap")
-file(COPY "${PROJECT_ROOT_PATH}/picture" DESTINATION "${PROJECT_OUTPUT_PARH}/Debug")
-file(COPY "${PROJECT_ROOT_PATH}/picture" DESTINATION "${PROJECT_OUTPUT_PARH}/Release")
-file(COPY "${PROJECT_ROOT_PATH}/picture" DESTINATION "${PROJECT_OUTPUT_PARH}/Wrap")
-install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION "${PROJECT_OUTPUT_PARH}/Wrap")
+FileCopyToPaths("${PROJECT_ROOT_PATH}/config")
+FileCopyToPaths("${PROJECT_ROOT_PATH}/ngrok")
+FileCopyToPaths("${PROJECT_ROOT_PATH}/picture")
+#file(COPY "${PROJECT_ROOT_PATH}/config" DESTINATION "${PROJECT_OUTPUT_PARH}/Debug")
+#file(COPY "${PROJECT_ROOT_PATH}/config" DESTINATION "${PROJECT_OUTPUT_PARH}/Release")
+#file(COPY "${PROJECT_ROOT_PATH}/config" DESTINATION "${PROJECT_OUTPUT_PARH}/Wrap")
+
+#file(COPY "${PROJECT_ROOT_PATH}/ngrok" DESTINATION "${PROJECT_OUTPUT_PARH}/Debug")
+#file(COPY "${PROJECT_ROOT_PATH}/ngrok" DESTINATION "${PROJECT_OUTPUT_PARH}/Release")
+#file(COPY "${PROJECT_ROOT_PATH}/ngrok" DESTINATION "${PROJECT_OUTPUT_PARH}/Wrap")
+
+#file(COPY "${PROJECT_ROOT_PATH}/picture" DESTINATION "${PROJECT_OUTPUT_PARH}/Debug")
+#file(COPY "${PROJECT_ROOT_PATH}/picture" DESTINATION "${PROJECT_OUTPUT_PARH}/Release")
+#file(COPY "${PROJECT_ROOT_PATH}/picture" DESTINATION "${PROJECT_OUTPUT_PARH}/Wrap")
+
+FilesCopyToPaths("${PROJECT_ROOT_PATH}/dll")
+#install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION "${PROJECT_OUTPUT_PARH}/Wrap")
