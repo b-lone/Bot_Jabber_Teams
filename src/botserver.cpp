@@ -116,7 +116,7 @@ void BotServer::OnNewMessage(std::shared_ptr<BotMessage> message)
             }
 
 
-            NETMANAGER->sendCreateMessage(msgForSend);
+            BOTNETWORKMANAGER->sendCreateMessage(msgForSend);
             messageIds.removeAll(message->id);
         }
     }
@@ -170,7 +170,7 @@ void BotServer::on_readyReadNgrok()
             auto messageId = dataObject.value("id").toString();
             messageIds.push_back(messageId);
 
-            NETMANAGER->sendGetMessageDetails(messageId);
+            BOTNETWORKMANAGER->sendGetMessageDetails(messageId);
         }
     }
 //    auto tcpClient = nrh->GetTcpSocket();

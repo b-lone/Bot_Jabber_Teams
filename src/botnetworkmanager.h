@@ -70,15 +70,15 @@ class BotNetworkManager : public QObject
     Q_OBJECT
 public:
     enum SendType{
-      Get = 0,
-      Post,
-      Put,
-      Delete,
+        Get = 0,
+        Post,
+        Put,
+        Delete,
     };
 
     static BotNetworkManager * Instance();
     void sendGetNgrokInfo();
-//---------------Memberships----------------------------------
+    //---------------Memberships----------------------------------
     //https://developer.webex.com/docs/api/v1/memberships/list-memberships
     //1.默认查询列出本人加入的room的本人的memberships，即加入几个room就会有几个结果返回
     //2.使用roomId查询某个room内所有成员的memberships，可以使用personId或personEmail(只能选其一)对此查询结果过滤,只能输入一个personId或personEmail，不可过滤多个
@@ -98,7 +98,7 @@ public:
 
     //https://developer.webex.com/docs/api/v1/memberships/delete-a-membership
     void sendDeleteMembership(QString membershipId);
-//---------------Messages----------------------------------
+    //---------------Messages----------------------------------
     //https://developer.webex.com/docs/api/v1/messages/list-messages
     //Lists all messages in a room.
     //mentionedPeople: List messages with these people mentioned, by ID. Use me as a shorthand for the current API user.
@@ -126,7 +126,7 @@ public:
     //https://developer.webex.com/docs/api/v1/messages/delete-a-message
     void sendDeleteMessage(QString messageId);
 
-//---------------People----------------------------------
+    //---------------People----------------------------------
     //https://developer.webex.com/docs/api/v1/people/list-people
     //有三种方式，email或者displayName只能提供一个，id一次可以提供不超过85个
     //byWhat: 0--email,1-displayName,2-id
@@ -135,7 +135,7 @@ public:
     //https://developer.webex.com/docs/api/v1/people/get-person-details
     void sendGetPersonDetails(QString personId);
 
-//---------------Rooms----------------------------------
+    //---------------Rooms----------------------------------
     //https://developer.webex.com/docs/api/v1/rooms/list-rooms
     //type: e.g. group,direct
     //sortBy: e.g. id, lastactivity, created
@@ -153,7 +153,7 @@ public:
     //https://developer.webex.com/docs/api/v1/rooms/delete-a-room
     void sendDeleteRoom(QString roomId);
 
-//---------------Webhooks----------------------------------
+    //---------------Webhooks----------------------------------
     //https://developer.webex.com/docs/api/v1/webhooks/list-webhooks
     void sendListWebhooks(int max = 100);
 
@@ -206,14 +206,17 @@ private:
                         std::shared_ptr<QNetworkRequest> request,
                         void (BotNetworkManager::*fuc)(BotNetworkReplyHelper *),
                         QHttpMultiPart * data = nullptr
-                        );
+            );
 
-     std::shared_ptr<QJsonObject> ExtractContect(BotNetworkReplyHelper * nrh);
+    std::shared_ptr<QJsonObject> ExtractContect(BotNetworkReplyHelper * nrh);
+
+signals:
+    void getNgrokURL(QString);
 
 private:
     std::shared_ptr<QNetworkAccessManager> networkAccessManager;
 };
 
-#define NETMANAGER BotNetworkManager::Instance()
+#define BOTNETWORKMANAGER BotNetworkManager::Instance()
 
 #endif // BOTNETWORKMANAGER_H

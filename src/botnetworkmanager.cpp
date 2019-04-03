@@ -450,32 +450,47 @@ void BotNetworkManager::sendDeleteWebhook(QString webhookId)
 
 void BotNetworkManager::on_GetNgrokInfo(BotNetworkReplyHelper *nrh)
 {
-    auto rootObj = this->ExtractContect(nrh);
-    BOTLOG(* rootObj);
-    if(rootObj->contains("uri")){
-        BOTLOG(rootObj->value("uri").toString());
+    BOTLOG("Receive message from ngrok");
+
+    auto reply = nrh->GetNetworkReply();
+
+    auto errorCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    BOTLOG("Reply status:(" + QString::number(errorCode) + "):" << reply->error());
+    if(reply->error() != QNetworkReply::NetworkError::NoError){
+        reply->deleteLater();
+        return;
+    }
+
+    QByteArray data = reply->readAll();
+    reply->deleteLater();
+
+    QJsonParseError jsonError;
+    QJsonDocument jsonDoc(QJsonDocument::fromJson(data, &jsonError));
+    BOTLOG(QString("Json parsing result:") << jsonError.error);
+    if(jsonError.error != QJsonParseError::ParseError::NoError){
+        return;
+    }
+
+    auto rootObj = jsonDoc.object();
+    if(rootObj.contains("uri")){
+        BOTLOG(rootObj.value("uri").toString());
     }else {
         BOTLOG("Error in get ngrok info!");
         return;
-    }
-//    BOTLOG(*rootObj);
-    {
-        auto tunnelsObj = rootObj->value("tunnels").toArray();
+    };
+    if (rootObj.contains("tunnels")) {
+        auto tunnelsObj = rootObj.value("tunnels").toArray();
         for (auto tunnel: tunnelsObj) {
             auto tunnelObj = tunnel.toObject();
             if(tunnelObj.value("proto").toString() == "https"){
                 auto sURl = tunnelObj.value("public_url").toString();
-
-                BOTLOG("Creat new webhook:" << sURl);
-                BotWebhook webhook;
-                webhook.name = "Kun You";
-                webhook.targetUrl = sURl;
-                webhook.resource = "messages";
-                webhook.event = "created";
-
-                this->sendCreateWebhook(webhook);
+                BOTLOG("URL:" << sURl);
+                emit getNgrokURL(sURl);
             }
         }
+    }else {
+        BOTLOG("Error in get ngrok info!");
+        return;
     }
 }
 
@@ -761,7 +776,6 @@ std::shared_ptr<QJsonObject> BotNetworkManager::ExtractContect(BotNetworkReplyHe
     auto reply = nrh->GetNetworkReply();
 
     auto errorCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-
     BOTLOG("Reply status:(" + QString::number(errorCode) + "):" << reply->error());
 
     QByteArray data = reply->readAll();
