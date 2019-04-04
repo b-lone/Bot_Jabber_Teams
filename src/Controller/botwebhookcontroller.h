@@ -17,7 +17,7 @@ signals:
 public slots:
     void on_getNgrokURL(QString url);
 private:
-    QString newNgrokUrl;
+    QString ngrokUrl;
 };
 
 #define BOTWEBHOOKCONTROLLER BotConfig::Instance()

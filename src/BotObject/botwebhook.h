@@ -1,12 +1,12 @@
 #ifndef BOTWEBHOOK_H
 #define BOTWEBHOOK_H
+#include "botobject.h"
 
 #include <memory>
 #include <QString>
 class QJsonObject;
-//class QDebug;
 
-class BotWebhook
+class BotWebhook : public BotObject
 {
 public:
     BotWebhook() = default;
@@ -14,9 +14,8 @@ public:
 
     std::shared_ptr<QJsonObject> Wrap();
 
-    friend QDebug operator <<(QDebug qd, const BotWebhook & webhook);
+    virtual QString Describe();
 
-    QString id;
     QString name;
     QString targetUrl;
     QString resource;
@@ -26,7 +25,5 @@ public:
     QString status;
     QString created;
 };
-
-QDebug operator <<(QDebug qd, const BotWebhook & webhook);
 
 #endif // BOTWEBHOOK_H

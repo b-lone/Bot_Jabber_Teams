@@ -9,23 +9,26 @@ include_directories(${SRC_CTRLER_PATH})
 include(${SRC_CTRLER_PATH}/controller.cmake)
 
 set(SRC_FILES
+${OBJ_SRC}
+${CTRLER_SRC}
 ${PROJECT_SRC_PATH}/main.cpp
 ${PROJECT_SRC_PATH}/botmainwindow.cpp
 ${PROJECT_SRC_PATH}/botconfig.cpp
 ${PROJECT_SRC_PATH}/botnetworkmanager.cpp
 ${PROJECT_SRC_PATH}/botserver.cpp
-${OBJ_SRC}
-${CTRLER_SRC}
+${PROJECT_SRC_PATH}/botnetworkcontroller.cpp
+${PROJECT_SRC_PATH}/botcommon.cpp
 )
 
 set(HEAD_FILES
+${OBJ_HEAD}
+${CTRLOR_HEAD}
 ${PROJECT_SRC_PATH}/botcommon.h
 ${PROJECT_SRC_PATH}/botmainwindow.h
 ${PROJECT_SRC_PATH}/botconfig.h
 ${PROJECT_SRC_PATH}/botnetworkmanager.h
 ${PROJECT_SRC_PATH}/botserver.h
-${OBJ_HEAD}
-${CTRLOR_HEAD}
+${PROJECT_SRC_PATH}/botnetworkcontroller.h
 )
 
 set(UI_FILES

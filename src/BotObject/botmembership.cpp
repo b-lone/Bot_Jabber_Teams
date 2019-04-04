@@ -18,17 +18,20 @@ BotMembership::BotMembership(QJsonObject *jsonObject)
     }
 }
 
-QDebug operator <<(QDebug qd, BotMembership & membership)
+QString BotMembership::Describe()
 {
-    return qd << "\n[BotMembership]\n{"
-              << "\n    id:" << membership.id
-              << "\n    roomID:" << membership.roomID
-              << "\n    personId:" << membership.personId
-              << "\n    personEmail:" << membership.personEmail
-              << "\n    personDisplayName:" << membership.personDisplayName
-              << "\n    personOrgId:" << membership.personOrgId
-              << "\n    isModerator:" << membership.isModerator
-              << "\n    isMonitor:" << membership.isMonitor
-              << "\n    created:" << membership.created
-              << "\n}";
+    QString str;
+    QTextStream ts(&str, QIODevice::WriteOnly);
+    ts << "\n[BotMembership]\n{"
+       << "\n    id:" << id
+       << "\n    roomID:" << roomID
+       << "\n    personId:" << personId
+       << "\n    personEmail:" << personEmail
+       << "\n    personDisplayName:" << personDisplayName
+       << "\n    personOrgId:" << personOrgId
+       << "\n    isModerator:" << isModerator
+       << "\n    isMonitor:" << isMonitor
+       << "\n    created:" << created
+       << "\n}";
+    return str;
 }

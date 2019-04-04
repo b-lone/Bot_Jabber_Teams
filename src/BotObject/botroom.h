@@ -7,23 +7,25 @@ class QJsonObject;
 class BotRoom : public BotObject
 {
 public:
+    typedef std::shared_ptr<BotRoom> PTR;
+
     //init by json
     BotRoom(QObject *parent = nullptr);
     BotRoom(QJsonObject  * jsonObject);
 
     void InitFromJson(QJsonObject * jsonObject);
 
-    //title
-    void setTitle(const QString & Title){ title = Title; }
-    const QString & getTitle(){ return title; }
-    //type
-    void setType(const QString & Type){ type = Type; }
-    const QString & getType(){ return type; }
+    virtual QString Describe();
 
-    //isLocked
-    void Locked(bool islock = true);
-
-    friend QDebug operator <<(QDebug os, BotRoom & rooom);
+//    //title
+//    void setTitle(const QString & Title){ title = Title; }
+//    const QString & getTitle(){ return title; }
+//    //type
+//    void setType(const QString & Type){ type = Type; }
+//    const QString & getType(){ return type; }
+//
+//    //isLocked
+//    void Locked(bool islock = true);
 
     QString title;
     QString type;
@@ -33,13 +35,6 @@ public:
     QString creatorId;
     QString created;
     QString sipAddress;
-};
-
-QDebug operator <<(QDebug qd, BotRoom & rooom);
-
-class BotRoomStore
-{
-public:
 };
 
 #endif // BOTROOM_H

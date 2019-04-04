@@ -54,32 +54,34 @@ BotPeople::BotPeople(QJsonObject *jsonObject)
     }
 }
 
-QDebug operator <<(QDebug qd, BotPeople & people)
+QString BotPeople::Describe()
 {
-
-    qd = qd << "\n[BotPeople]\n{"
-            << "\n    id:" << people.id
-            << "\n    emails:" << people.emails
-            << "\n    phoneNumber:{";
-    for (auto phoneNumber: people.phoneNumbers) {
-        qd = qd << "\n                     type:" << phoneNumber.type
-                << "\n                     value:" << phoneNumber.value
-                << "\n                }";
+    QString str;
+    QTextStream ts(&str, QIODevice::WriteOnly);
+    ts << "\n[BotPeople]\n{"
+       << "\n    id:" << id
+       << "\n    emails:" << emails.join(",")
+       << "\n    phoneNumber:{";
+    for (auto phoneNumber: phoneNumbers) {
+        ts << "\n                     type:" << phoneNumber.type
+           << "\n                     value:" << phoneNumber.value
+           << "\n                }";
     };
-    return qd << "\n    displayName:" << people.displayName
-              << "\n    nickName:" << people.nickName
-              << "\n    firstName:" << people.firstName
-              << "\n    lastName:" << people.lastName
-              << "\n    avatar:" << people.avatar
-              << "\n    orgId:" << people.orgId
-              << "\n    roles:" << people.roles
-              << "\n    licenses:" << people.licenses
-              << "\n    created:" << people.created
-              << "\n    timezone:" << people.timezone
-              << "\n    lastActivity:" << people.lastActivity
-              << "\n    status:" << people.status
-              << "\n    invitePending:" << people.invitePending
-              << "\n    loginEnabled:" << people.loginEnabled
-              << "\n    type:" << people.type
-              << "\n}";
+    ts << "\n    displayName:" << displayName
+       << "\n    nickName:" << nickName
+       << "\n    firstName:" << firstName
+       << "\n    lastName:" << lastName
+       << "\n    avatar:" << avatar
+       << "\n    orgId:" << orgId
+       << "\n    roles:" << roles.join(",")
+       << "\n    licenses:" << licenses.join(",")
+       << "\n    created:" << created
+       << "\n    timezone:" << timezone
+       << "\n    lastActivity:" << lastActivity
+       << "\n    status:" << status
+       << "\n    invitePending:" << invitePending
+       << "\n    loginEnabled:" << loginEnabled
+       << "\n    type:" << type
+       << "\n}";
+    return str;
 }

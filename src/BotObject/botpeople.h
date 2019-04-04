@@ -1,11 +1,10 @@
 #ifndef BOTPEOPLE_H
 #define BOTPEOPLE_H
+#include <botobject.h>
 
-#include <mutex>
 #include <QVector>
 #include <QStringList>
 class QJsonObject;
-//class QDebug;
 
 struct BotPhoneNumber
 {
@@ -13,16 +12,15 @@ struct BotPhoneNumber
     QString value;
 };
 
-class BotPeople
+class BotPeople : public BotObject
 {
 public:
     //init by json
     BotPeople() = default;
     BotPeople(QJsonObject *jsonObject);
 
-    friend QDebug operator <<(QDebug os, BotPeople & people);
+    virtual QString Describe();
 
-    QString id;
     QStringList emails;
     QVector<BotPhoneNumber> phoneNumbers;
     QString displayName;
@@ -40,9 +38,6 @@ public:
     QString invitePending;
     QString loginEnabled;
     QString type;
-
 };
-
-QDebug operator <<(QDebug qd, BotPeople & people);
 
 #endif // BOTPEOPLE_H

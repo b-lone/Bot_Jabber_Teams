@@ -1,20 +1,19 @@
 #ifndef BOTMEMBERSHIP_H
 #define BOTMEMBERSHIP_H
 
-#include <QString>
+#include "botobject.h"
+
 class QJsonObject;
-//class QDebug;
 
 
-class BotMembership
+class BotMembership : public BotObject
 {
 public:
     //init by json
     BotMembership(QJsonObject *jsonObject);
 
-   friend QDebug operator <<(QDebug os, BotMembership & membership);
+    virtual QString Describe();
 
-    QString id;
     QString roomID;
     QString personId;
     QString personEmail;
@@ -24,7 +23,5 @@ public:
     bool isMonitor;
     QString created;
 };
-
-QDebug operator <<(QDebug qd, BotMembership & membership);
 
 #endif // BOTMEMBERSHIP_H

@@ -43,22 +43,25 @@ BotMessage::BotMessage(QJsonObject *jsonObject)
     }
 }
 
-QDebug operator <<(QDebug qd, BotMessage &message)
+QString BotMessage::Describe()
 {
-    return qd << "\n[BotMessage]\n{"
-              << "\n    id:" << message.id
-              << "\n    roomId:" << message.roomId
-              << "\n    roomType:" << message.roomType
-              << "\n    toPersonId:" << message.toPersonId
-              << "\n    toPersonEmail:" << message.toPersonEmail
-              << "\n    text:" << message.text
-              << "\n    markdown:" << message.markdown
-              << "\n    html:" << message.html
-              << "\n    files:" << message.files
-              << "\n    personId:" << message.personId
-              << "\n    personEmail:" << message.personEmail
-              << "\n    mentionedPeople:" << message.mentionedPeople
-              << "\n    mentionedGroups:" << message.mentionedGroups
-              << "\n    created:" << message.created
-              << "\n}";
+    QString str;
+    QTextStream ts(&str, QIODevice::WriteOnly);
+    ts << "\n[BotMessage]\n{"
+       << "\n    id:" << id
+       << "\n    roomId:" << roomId
+       << "\n    roomType:" << roomType
+       << "\n    toPersonId:" << toPersonId
+       << "\n    toPersonEmail:" << toPersonEmail
+       << "\n    text:" << text
+       << "\n    markdown:" << markdown
+       << "\n    html:" << html
+       << "\n    files:" << files.join(",")
+       << "\n    personId:" << personId
+       << "\n    personEmail:" << personEmail
+       << "\n    mentionedPeople:" << mentionedPeople.join(",")
+       << "\n    mentionedGroups:" << mentionedGroups.join(",")
+       << "\n    created:" << created
+       << "\n}";
+    return str;
 }

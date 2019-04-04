@@ -30,17 +30,20 @@ std::shared_ptr<QJsonObject> BotWebhook::Wrap()
     return jsonObjectPtr;
 }
 
-QDebug operator <<(QDebug qd, const BotWebhook &webhook)
+QString BotWebhook::Describe()
 {
-    return qd << "\n[BotWebhook]\n{"
-              << "\n    id:" << webhook.id
-              << "\n    name:" << webhook.name
-              << "\n    targetUrl:" << webhook.targetUrl
-              << "\n    resource:" << webhook.resource
-              << "\n    event:" << webhook.event
-              << "\n    filter:" << webhook.filter
-              << "\n    secret:" << webhook.secret
-              << "\n    status:" << webhook.status
-              << "\n    created:" << webhook.created
-              << "\n}";
+    QString str;
+    QTextStream ts(&str, QIODevice::WriteOnly);
+    ts << "\n[BotWebhook]\n{"
+       << "\n    id:" << id
+       << "\n    name:" << name
+       << "\n    targetUrl:" << targetUrl
+       << "\n    resource:" << resource
+       << "\n    event:" << event
+       << "\n    filter:" << filter
+       << "\n    secret:" << secret
+       << "\n    status:" << status
+       << "\n    created:" << created
+       << "\n}";
+    return str;
 }

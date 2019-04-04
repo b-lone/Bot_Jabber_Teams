@@ -13,6 +13,15 @@ class QHttpMultiPart;
 class BotWebhook;
 class BotMessage;
 
+enum RequestType{
+    memberships = 0,
+    messages,
+    people,
+    rooms,
+    webhooks
+};
+
+
 class BotNetworkReplyHelper : public QObject
 {
     Q_OBJECT
@@ -34,25 +43,19 @@ private:
 class BotNetworkRepquestHelper : public QObject
 {
     Q_OBJECT
-public:
-    enum RequestType{
-        memberships = 0,
-        messages,
-        people,
-        rooms,
-        webhooks,
-    };
     Q_ENUM(RequestType)
-
+public:
     BotNetworkRepquestHelper(RequestType type);
 
     std::shared_ptr<QNetworkRequest> GennerateRequest();
 
-    void setParams(const QString &key, const QString &value){ params[key] = value; }
+    void setParams(const QString &key, const QString &value) { params[key] = value; }
 
     void setContentType(const QString & contentType);
 
-    void setObjectId(const QString & Id){ objectId = Id; }
+    void setObjectId(const QString & Id) { objectId = Id; }
+
+    RequestType getRequestType() { return requestType; }
 private:
     QString RequestTypeToString(RequestType type);
 private:

@@ -1,21 +1,22 @@
 #ifndef BOTMESSAGE_H
 #define BOTMESSAGE_H
 
-//#include <QString>
+#include <botobject.h>
+
 #include <QStringList>
 
 class QJsonObject;
 //class QDebug;
 
-class BotMessage
+class BotMessage : public BotObject
 {
 public:
     //init by json
     BotMessage() = default;
     BotMessage(QJsonObject *jsonObject);
-    friend QDebug operator <<(QDebug qd, BotMessage & message);
 
-    QString id;
+    virtual QString Describe();
+
     QString roomId;
     QString roomType;
     QString toPersonId;
@@ -31,5 +32,4 @@ public:
     QString created;
 };
 
-QDebug operator <<(QDebug qd, BotMessage & message);
 #endif // BOTMESSAGE_H

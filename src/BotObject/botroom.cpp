@@ -1,5 +1,6 @@
 #include "botroom.h"
 
+#include <QTextStream>
 #include <QJsonObject>
 #include <QDebug>
 
@@ -26,17 +27,20 @@ void BotRoom::InitFromJson(QJsonObject *jsonObject)
 
 }
 
-QDebug operator <<(QDebug qd, BotRoom & room)
+QString BotRoom::Describe()
 {
-    return qd << "\n[BotRoom]\n{"
-              << "\n    id:" << room.id
-              << "\n    title:" << room.title
-              << "\n    type:" << room.type
-              << "\n    isLocked:" << room.isLocked
-              << "\n    teamId:" << room.teamId
-              << "\n    lastActivity:" << room.lastActivity
-              << "\n    creatorId:" << room.creatorId
-              << "\n    created:" << room.created
-              << "\n    sipAddress:" << room.sipAddress
-              << "\n}";
+    QString str;
+    QTextStream ts(&str, QIODevice::WriteOnly);
+    ts << "\n[BotRoom]\n{"
+        << "\n    id:" << id
+        << "\n    title:" << title
+        << "\n    type:" << type
+        << "\n    isLocked:" << isLocked
+        << "\n    teamId:" << teamId
+        << "\n    lastActivity:" << lastActivity
+        << "\n    creatorId:" << creatorId
+        << "\n    created:" << created
+        << "\n    sipAddress:" << sipAddress
+        << "\n}";
+    return str;
 }

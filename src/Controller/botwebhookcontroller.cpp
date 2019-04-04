@@ -26,8 +26,9 @@ BotWebhookController::BotWebhookController(QObject *parent) : QObject(parent)
 void BotWebhookController::on_getNgrokURL(QString url)
 {
     BOTLOG("Deal with Ngrok URL");
-    if(newNgrokUrl == url)
+    if(ngrokUrl == url)
         return;
+    ngrokUrl = url;
 
-
+    BOTNETWORKMANAGER->sendListWebhooks();
 }

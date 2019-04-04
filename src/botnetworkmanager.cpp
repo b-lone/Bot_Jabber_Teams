@@ -33,7 +33,7 @@ void BotNetworkReplyHelper::on_finished()
 const QString BotNetworkRepquestHelper::mUrl = "https://api.ciscospark.com/v1/";
 const QString BotNetworkRepquestHelper::contentType_Json = "application/json";
 
-BotNetworkRepquestHelper::BotNetworkRepquestHelper(BotNetworkRepquestHelper::RequestType type): requestType(type)
+BotNetworkRepquestHelper::BotNetworkRepquestHelper(RequestType type): requestType(type)
 {
     this->request = std::make_shared<QNetworkRequest>();
 
@@ -71,7 +71,7 @@ void BotNetworkRepquestHelper::setContentType(const QString &contentType)
     this->request->setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, contentType);
 }
 
-QString BotNetworkRepquestHelper::RequestTypeToString(BotNetworkRepquestHelper::RequestType type)
+QString RequestTypeToString(RequestType type)
 {
     return  QMetaEnum::fromType<RequestType>().valueToKey(type);
 //    static QMap<RequestType, QString> queryList = {
@@ -109,7 +109,7 @@ void BotNetworkManager::sendGetNgrokInfo()
 
 void BotNetworkManager::sendGetMemberships(QString roomId, QString filterString, bool isFilterByPersonId)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::memberships);
+    BotNetworkRepquestHelper networkRequestHelper(RequestType::memberships);
     if(roomId != ""){
         networkRequestHelper.setParams("roomId",roomId);
         if(filterString != ""){
@@ -128,7 +128,7 @@ void BotNetworkManager::sendGetMemberships(QString roomId, QString filterString,
 
 void BotNetworkManager::sendCreateAMembership(QString roomId, bool isModerator, QString byString, bool isByEmail)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::memberships);
+    BotNetworkRepquestHelper networkRequestHelper(RequestType::memberships);
     networkRequestHelper.setContentType(BotNetworkRepquestHelper::contentType_Json);
     auto request = networkRequestHelper.GennerateRequest();
 
@@ -146,7 +146,7 @@ void BotNetworkManager::sendCreateAMembership(QString roomId, bool isModerator, 
 
 void BotNetworkManager::sendGetMembership(QString membershipId)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::memberships);
+    BotNetworkRepquestHelper networkRequestHelper(RequestType::memberships);
     networkRequestHelper.setObjectId(membershipId);
     auto request = networkRequestHelper.GennerateRequest();
 
@@ -155,7 +155,7 @@ void BotNetworkManager::sendGetMembership(QString membershipId)
 
 void BotNetworkManager::sendUpdateMembership(QString membershipId, bool isModerator)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::memberships);
+    BotNetworkRepquestHelper networkRequestHelper(RequestType::memberships);
     networkRequestHelper.setObjectId(membershipId);
     networkRequestHelper.setContentType(BotNetworkRepquestHelper::contentType_Json);
     auto request = networkRequestHelper.GennerateRequest();
@@ -168,7 +168,7 @@ void BotNetworkManager::sendUpdateMembership(QString membershipId, bool isModera
 
 void BotNetworkManager::sendDeleteMembership(QString membershipId)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::memberships);
+    BotNetworkRepquestHelper networkRequestHelper(RequestType::memberships);
     networkRequestHelper.setObjectId(membershipId);
     auto request = networkRequestHelper.GennerateRequest();
 
@@ -177,7 +177,7 @@ void BotNetworkManager::sendDeleteMembership(QString membershipId)
 
 void BotNetworkManager::sendListMessages(QString roomId, QString mentionedPeople, QString before, QString beforeMessage, int max)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::messages);
+    BotNetworkRepquestHelper networkRequestHelper(RequestType::messages);
     networkRequestHelper.setParams("roomId", roomId);
     if(mentionedPeople != ""){
         networkRequestHelper.setParams("mentionedPeople", mentionedPeople);
@@ -196,7 +196,7 @@ void BotNetworkManager::sendListMessages(QString roomId, QString mentionedPeople
 
 void BotNetworkManager::sendListDirectMessages(QString byString, bool isByEmail)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::messages);
+    BotNetworkRepquestHelper networkRequestHelper(RequestType::messages);
     networkRequestHelper.setObjectId("direct");
     if(isByEmail){
         networkRequestHelper.setParams("personEmail", byString);
@@ -210,7 +210,7 @@ void BotNetworkManager::sendListDirectMessages(QString byString, bool isByEmail)
 
 void BotNetworkManager::sendCreateMessage(const BotMessage &message)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::messages);
+    BotNetworkRepquestHelper networkRequestHelper(RequestType::messages);
     auto request = networkRequestHelper.GennerateRequest();
 
     QHttpMultiPart * multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
@@ -289,7 +289,7 @@ void BotNetworkManager::sendCreateMessage(const BotMessage &message)
 
 void BotNetworkManager::sendGetMessageDetails(QString messageId)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::messages);
+    BotNetworkRepquestHelper networkRequestHelper(RequestType::messages);
     networkRequestHelper.setObjectId(messageId);
     auto request = networkRequestHelper.GennerateRequest();
 
@@ -298,7 +298,7 @@ void BotNetworkManager::sendGetMessageDetails(QString messageId)
 
 void BotNetworkManager::sendDeleteMessage(QString messageId)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::messages);
+    BotNetworkRepquestHelper networkRequestHelper(RequestType::messages);
     networkRequestHelper.setObjectId(messageId);
     auto request = networkRequestHelper.GennerateRequest();
 
@@ -307,7 +307,7 @@ void BotNetworkManager::sendDeleteMessage(QString messageId)
 
 void BotNetworkManager::sendListPeople(QString byString, int byWhat, int max)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::people);
+    BotNetworkRepquestHelper networkRequestHelper(RequestType::people);
     switch(byWhat){
     case 0:
         networkRequestHelper.setParams("email", byString);
@@ -330,7 +330,7 @@ void BotNetworkManager::sendListPeople(QString byString, int byWhat, int max)
 
 void BotNetworkManager::sendGetPersonDetails(QString personId)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::people);
+    BotNetworkRepquestHelper networkRequestHelper(RequestType::people);
     networkRequestHelper.setObjectId(personId);
     auto request = networkRequestHelper.GennerateRequest();
 
@@ -339,7 +339,7 @@ void BotNetworkManager::sendGetPersonDetails(QString personId)
 
 void BotNetworkManager::sendListRooms(QString type, QString sortBy, int max)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::rooms);
+    BotNetworkRepquestHelper networkRequestHelper(RequestType::rooms);
     if(type != ""){
         networkRequestHelper.setParams("type", type);
     }
@@ -354,7 +354,7 @@ void BotNetworkManager::sendListRooms(QString type, QString sortBy, int max)
 
 void BotNetworkManager::sendCreateRoom(QString title)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::rooms);
+    BotNetworkRepquestHelper networkRequestHelper(RequestType::rooms);
     networkRequestHelper.setContentType(BotNetworkRepquestHelper::contentType_Json);
     auto request = networkRequestHelper.GennerateRequest();
 
@@ -366,7 +366,7 @@ void BotNetworkManager::sendCreateRoom(QString title)
 
 void BotNetworkManager::sendGetRoomDetails(QString roomId)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::rooms);
+    BotNetworkRepquestHelper networkRequestHelper(RequestType::rooms);
     networkRequestHelper.setObjectId(roomId);
     auto request = networkRequestHelper.GennerateRequest();
 
@@ -375,7 +375,7 @@ void BotNetworkManager::sendGetRoomDetails(QString roomId)
 
 void BotNetworkManager::sendUpdateRoom(QString roomId, QString title)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::rooms);
+    BotNetworkRepquestHelper networkRequestHelper(RequestType::rooms);
     networkRequestHelper.setContentType(BotNetworkRepquestHelper::contentType_Json);
     networkRequestHelper.setObjectId(roomId);
     auto request = networkRequestHelper.GennerateRequest();
@@ -388,7 +388,7 @@ void BotNetworkManager::sendUpdateRoom(QString roomId, QString title)
 
 void BotNetworkManager::sendDeleteRoom(QString roomId)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::rooms);
+    BotNetworkRepquestHelper networkRequestHelper(RequestType::rooms);
     networkRequestHelper.setObjectId(roomId);
     auto request = networkRequestHelper.GennerateRequest();
 
@@ -397,7 +397,7 @@ void BotNetworkManager::sendDeleteRoom(QString roomId)
 
 void BotNetworkManager::sendListWebhooks(int max)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::webhooks);
+    BotNetworkRepquestHelper networkRequestHelper(RequestType::webhooks);
     networkRequestHelper.setParams("max", QString::number(max));
     auto request = networkRequestHelper.GennerateRequest();
 
@@ -406,7 +406,7 @@ void BotNetworkManager::sendListWebhooks(int max)
 
 void BotNetworkManager::sendCreateWebhook(BotWebhook & webhook)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::webhooks);
+    BotNetworkRepquestHelper networkRequestHelper(RequestType::webhooks);
     networkRequestHelper.setContentType(BotNetworkRepquestHelper::contentType_Json);
     auto request = networkRequestHelper.GennerateRequest();
 
@@ -417,7 +417,7 @@ void BotNetworkManager::sendCreateWebhook(BotWebhook & webhook)
 
 void BotNetworkManager::sendGetWebhookDetails(QString webhookId)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::webhooks);
+    BotNetworkRepquestHelper networkRequestHelper(RequestType::webhooks);
     networkRequestHelper.setObjectId(webhookId);
     auto request = networkRequestHelper.GennerateRequest();
 
@@ -426,7 +426,7 @@ void BotNetworkManager::sendGetWebhookDetails(QString webhookId)
 
 void BotNetworkManager::sendUpdateWebhook(QString webhookId, QString name, QString targetUrl, QString status)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::webhooks);
+    BotNetworkRepquestHelper networkRequestHelper(RequestType::webhooks);
     networkRequestHelper.setContentType(BotNetworkRepquestHelper::contentType_Json);
     networkRequestHelper.setObjectId(webhookId);
     auto request = networkRequestHelper.GennerateRequest();
@@ -441,7 +441,7 @@ void BotNetworkManager::sendUpdateWebhook(QString webhookId, QString name, QStri
 
 void BotNetworkManager::sendDeleteWebhook(QString webhookId)
 {
-    BotNetworkRepquestHelper networkRequestHelper(BotNetworkRepquestHelper::RequestType::rooms);
+    BotNetworkRepquestHelper networkRequestHelper(RequestType::rooms);
     networkRequestHelper.setObjectId(webhookId);
     auto request = networkRequestHelper.GennerateRequest();
 
