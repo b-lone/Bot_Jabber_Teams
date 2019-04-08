@@ -391,47 +391,15 @@ void BotNetworkManager::sendDelete(RequestType rt, QString id)
 void BotNetworkManager::on_GetNgrokInfo(BotNetworkReplyHelper *nrh)
 {
     BOTLOG("Receive message from ngrok");
-
     auto reply = nrh->GetNetworkReply();
 
-    auto errorCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    BOTLOG("Reply status:(" + QString::number(errorCode) + "):" << reply->error());
-    if(reply->error() != QNetworkReply::NetworkError::NoError){
-        reply->deleteLater();
+    auto errorCode = ParseReplyResult(reply);
+    if(errorCode < 200 || errorCode >= 300){
         return;
     }
-
-    QByteArray data = reply->readAll();
+    std::shared_ptr<QByteArray> data(new QByteArray(reply->readAll()));
+    emit ngrokReady(data);
     reply->deleteLater();
-
-    QJsonParseError jsonError;
-    QJsonDocument jsonDoc(QJsonDocument::fromJson(data, &jsonError));
-    BOTLOG(QString("Json parsing result:") << jsonError.error);
-    if(jsonError.error != QJsonParseError::ParseError::NoError){
-        return;
-    }
-
-    auto rootObj = jsonDoc.object();
-    if(rootObj.contains("uri")){
-        BOTLOG(rootObj.value("uri").toString());
-    }else {
-        BOTLOG("Error in get ngrok info!");
-        return;
-    };
-    if (rootObj.contains("tunnels")) {
-        auto tunnelsObj = rootObj.value("tunnels").toArray();
-        for (auto tunnel: tunnelsObj) {
-            auto tunnelObj = tunnel.toObject();
-            if(tunnelObj.value("proto").toString() == "https"){
-                auto sURl = tunnelObj.value("public_url").toString();
-                BOTLOG("URL:" << sURl);
-                emit getNgrokURL(sURl);
-            }
-        }
-    }else {
-        BOTLOG("Error in get ngrok info!");
-        return;
-    }
 }
 
 void BotNetworkManager::on_finished(BotNetworkReplyHelper *nrh)
@@ -491,7 +459,7 @@ int BotNetworkManager::ParseReplyResult(QNetworkReply *reply)
     BOTLOG("Reply status:(" + QString::number(errorCode) + "):" << reply->error());
     if(errorCode < 200 || errorCode >= 300){
         QByteArray data = reply->readAll();
-        QJsonObject * jsonObject{};
+        QJsonObject * jsonObject = new QJsonObject;
         if(ParseBytesToJson(data, jsonObject)){
             if(jsonObject->contains("message"))
                 BOTLOG(jsonObject->value("message"));

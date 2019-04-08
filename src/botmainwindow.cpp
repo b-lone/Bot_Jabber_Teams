@@ -3,7 +3,6 @@
 #include <QProcess>
 #include <QMessageBox>
 #include <QThread>
-#include <QSysInfo>
 
 #include "botnetworkmanager.h"
 #include "botconfig.h"
@@ -12,71 +11,34 @@
 #include "botmessage.h"
 #include "botcommon.h"
 #include "botnetworkcontroller.h"
+#include "botprocesshelper.h"
 
 BotMainWindow::BotMainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::BotMainWindow)
 {
     ui->setupUi(this);
-    runNgrok();
     BOTSERVER->Listen();
 
     networkController = new BotNetworkController(this);
     connect(BOTNETWORKMANAGER, &BotNetworkManager::dataReady, networkController, &BotNetworkController::on_dataReady);
+
+    processHelper = new BotProcessHelper(this);
+    connect(processHelper, &BotProcessHelper::errorOccurred, this, &BotMainWindow::showMessages);
+    processHelper->RunNgrok();
 }
 
 BotMainWindow::~BotMainWindow()
 {
-    if(ngrok){
-        ngrok->kill();
-        BOTLOG("Kill ngrok:" << ngrok->state());
-//        while(ngrok->state() != QProcess::ProcessState::NotRunning)
-//            QThread::sleep(1);
-    }
     delete ui;
 }
 
-void BotMainWindow::runNgrok()
+void BotMainWindow::showMessages(QString msg)
 {
-    if(!ngrok){
-        ngrok = new QProcess;
-        QObject::connect(ngrok, &QProcess::started, this, &BotMainWindow::on_start);
-        QObject::connect(ngrok, &QProcess::errorOccurred, this, &BotMainWindow::on_errorOccurred);
-    }
-    if(!ngrok->isOpen()){
-        BOTLOG("Start ngrok.");
-        auto os = QSysInfo().productType();
-        QString ngrokPath;
-        BOTLOG(os);
-        if(os.contains("win")){
-            ngrokPath = QApplication::applicationDirPath() + "/ngrok/ngrok.exe";
-        }
-        else if (os == "osx") {
-            ngrokPath = QApplication::applicationDirPath() + "/ngrok/ngrok";
-        }
-        QStringList args;
-        args << "http";
-        args << BOTCONFIG->Value(BotConfig::ngrokPort).toString();
-        BOTLOG(args);
-        ngrok->start(ngrokPath, args, QProcess::OpenModeFlag::ReadWrite);
-        ngrok->start(ngrokPath);
-        ngrok->waitForStarted();
-    }
-}
-
-void BotMainWindow::on_start()
-{
-    BOTLOG("Start ngrok sucessful!");
-}
-
-void BotMainWindow::on_errorOccurred()
-{
-    BOTLOG("Start ngrok failed:" << ngrok->error());
     auto msgBox = new QMessageBox(this);
-    msgBox->setText("Start ngrok failed!");
+    msgBox->setText(msg);
     msgBox->setModal(true);
     msgBox->show();
-
 }
 
 void BotMainWindow::on_btnRooms_clicked()

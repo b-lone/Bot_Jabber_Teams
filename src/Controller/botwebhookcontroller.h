@@ -3,25 +3,29 @@
 
 #include <QObject>
 
-#include <QString>
+#include <memory>
+#include <botnetworkmanager.h>
+
+class BotWebhook;
 
 class BotWebhookController : public QObject
 {
     Q_OBJECT
 public:
-    static BotWebhookController * Instance();
+    explicit BotWebhookController(QObject *parent = nullptr);
 
 private:
-    explicit BotWebhookController(QObject *parent = nullptr);
+    bool ParseData(std::shared_ptr<QByteArray> data, QString &URL);
 
 signals:
 
 public slots:
-    void on_getNgrokURL(QString url);
+    void on_ngrokReady(std::shared_ptr<QByteArray> data);
+    void on_webhookReady(std::shared_ptr<BotWebhook> object);
+    void on_emptyList(RequestType rt);
+
 private:
     QString ngrokUrl;
 };
-
-#define BOTWEBHOOKCONTROLLER BotConfig::Instance()
 
 #endif // BOTWEBHOOKCONTROLLER_H

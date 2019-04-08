@@ -18,6 +18,7 @@ ${PROJECT_SRC_PATH}/botnetworkmanager.cpp
 ${PROJECT_SRC_PATH}/botserver.cpp
 ${PROJECT_SRC_PATH}/botnetworkcontroller.cpp
 ${PROJECT_SRC_PATH}/botcommon.cpp
+${PROJECT_SRC_PATH}/botprocesshelper.cpp
 )
 
 set(HEAD_FILES
@@ -29,6 +30,7 @@ ${PROJECT_SRC_PATH}/botconfig.h
 ${PROJECT_SRC_PATH}/botnetworkmanager.h
 ${PROJECT_SRC_PATH}/botserver.h
 ${PROJECT_SRC_PATH}/botnetworkcontroller.h
+${PROJECT_SRC_PATH}/botprocesshelper.h
 )
 
 set(UI_FILES

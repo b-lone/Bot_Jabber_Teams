@@ -24,9 +24,13 @@ void BotNetworkController::on_dataReady(std::shared_ptr<QByteArray> data, Reques
         if(jsonObject->contains("items")){
             BOTLOG("Multi objects.");
             QJsonArray subArray = jsonObject->value("items").toArray();
-            for (int i = 0; i< subArray.size(); i++) {
-                QJsonObject subObject = subArray[i].toObject();
-                Distribute(&subObject, requestType);
+            if(subArray.count()){
+                for (int i = 0; i< subArray.size(); i++) {
+                    QJsonObject subObject = subArray[i].toObject();
+                    Distribute(&subObject, requestType);
+                }
+            }else{
+                emit emptyList(requestType);
             }
         }else {
             BOTLOG("Single object.");
@@ -101,9 +105,3 @@ void BotNetworkController::Memberships(QJsonObject *jsonObject)
         emit membershipReady(object);
     }
 }
-
-//void BotNetworkController::on_getObject(std::shared_ptr<BotObject> object)
-//{
-//    BotRoom::PTR cptr = std::dynamic_pointer_cast<BotRoom>(object);
-//    if(cptr)
-//}

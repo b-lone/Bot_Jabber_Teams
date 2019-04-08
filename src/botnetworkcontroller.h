@@ -23,6 +23,7 @@ signals:
     void messageReady(std::shared_ptr<BotMessage>);
     void webhookReady(std::shared_ptr<BotWebhook>);
     void membershipReady(std::shared_ptr<BotMembership>);
+    void emptyList(RequestType);
 
 public slots:
     void on_dataReady(std::shared_ptr<QByteArray> data, RequestType requestType);

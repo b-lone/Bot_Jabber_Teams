@@ -5,6 +5,7 @@
 #include <memory>
 class QProcess;
 class BotNetworkController;
+class BotProcessHelper;
 
 namespace Ui {
 class BotMainWindow;
@@ -17,13 +18,9 @@ class BotMainWindow : public QMainWindow
 public:
     explicit BotMainWindow(QWidget *parent = nullptr);
     ~BotMainWindow();
-private:
-    void runNgrok();
 
 public slots:
-    //ngrok Progress slot
-    void on_start();
-    void on_errorOccurred();
+   void showMessages(QString msg);
 
 private slots:  
     void on_btnRooms_clicked();
@@ -74,8 +71,8 @@ private slots:
 
 private:
     Ui::BotMainWindow *ui;
-    QProcess * ngrok = nullptr;
     BotNetworkController *networkController;
+    BotProcessHelper *processHelper;
 };
 
 #endif // BOTMAINWINDOW_H

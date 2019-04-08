@@ -174,8 +174,8 @@ public:
     void sendDelete(RequestType rt, QString id);
 
 signals:
-    void getNgrokURL(QString);
     void dataReady(std::shared_ptr<QByteArray>, RequestType);
+    void ngrokReady(std::shared_ptr<QByteArray>);
 
 private slots:
     void on_GetNgrokInfo(BotNetworkReplyHelper * nrh);
