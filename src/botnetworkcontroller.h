@@ -5,6 +5,12 @@
 
 #include <botnetworkmanager.h>
 
+class BotRoom;
+class BotPeople;
+class BotMessage;
+class BotWebhook;
+class BotMembership;
+
 class BotNetworkController : public QObject
 {
     Q_OBJECT
@@ -12,9 +18,14 @@ public:
     explicit BotNetworkController(QObject *parent = nullptr);
 
 signals:
+    void roomReady(std::shared_ptr<BotRoom>);
+    void peopleReady(std::shared_ptr<BotPeople>);
+    void messageReady(std::shared_ptr<BotMessage>);
+    void webhookReady(std::shared_ptr<BotWebhook>);
+    void membershipReady(std::shared_ptr<BotMembership>);
 
 public slots:
-    void on_dataReady(const QByteArray & data, RequestType requestType);
+    void on_dataReady(std::shared_ptr<QByteArray> data, RequestType requestType);
     
 private:
     void Distribute(QJsonObject * jsonObject, RequestType requestType);

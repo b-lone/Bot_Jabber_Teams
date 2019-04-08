@@ -4,7 +4,24 @@
 #include <QJsonArray>
 #include <QDebug>
 
+BotPeople::PTR BotPeople::New(QJsonObject *jsonObject)
+{
+    PTR ptr(new BotPeople);
+    ptr->InitByJson(jsonObject);
+    return ptr;
+}
+
+BotPeople::BotPeople(QObject *parent): BotObject (parent)
+{
+
+}
+
 BotPeople::BotPeople(QJsonObject *jsonObject)
+{
+    InitByJson(jsonObject);
+}
+
+void BotPeople::InitByJson(QJsonObject *jsonObject)
 {
     if(jsonObject){
         this->id = jsonObject->value("id").toString();

@@ -15,9 +15,14 @@ struct BotPhoneNumber
 class BotPeople : public BotObject
 {
 public:
+    typedef std::shared_ptr<BotPeople> PTR;
+    static PTR New(QJsonObject * jsonObject);
+
     //init by json
-    BotPeople() = default;
+    BotPeople(QObject *parent = nullptr);
     BotPeople(QJsonObject *jsonObject);
+
+    void InitByJson(QJsonObject * jsonObject);
 
     virtual QString Describe();
 

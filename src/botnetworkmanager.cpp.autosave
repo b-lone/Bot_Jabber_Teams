@@ -391,7 +391,6 @@ void BotNetworkManager::sendDelete(RequestType rt, QString id)
 void BotNetworkManager::on_GetNgrokInfo(BotNetworkReplyHelper *nrh)
 {
     BOTLOG("Receive message from ngrok");
-
     auto reply = nrh->GetNetworkReply();
 
     auto errorCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
@@ -491,7 +490,7 @@ int BotNetworkManager::ParseReplyResult(QNetworkReply *reply)
     BOTLOG("Reply status:(" + QString::number(errorCode) + "):" << reply->error());
     if(errorCode < 200 || errorCode >= 300){
         QByteArray data = reply->readAll();
-        QJsonObject * jsonObject{};
+        QJsonObject * jsonObject = new QJsonObject;
         if(ParseBytesToJson(data, jsonObject)){
             if(jsonObject->contains("message"))
                 BOTLOG(jsonObject->value("message"));

@@ -31,7 +31,7 @@ void BotStore::PushMessage(std::shared_ptr<BotMessage> object)
 
 void BotStore::PushRoom(std::shared_ptr<BotRoom> object)
 {
-    if (std::find_if(roomStore.begin(), roomStore.end(), [&](std::shared_ptr<BotRoom> item){return (item->getId() == object->getId());}) == roomStore.end()) {
+    if (std::find_if(roomStore.begin(), roomStore.end(), [&](std::shared_ptr<BotRoom> item){return (item->id == object->id);}) == roomStore.end()) {
         BOTLOG("Add new object:" << object->title);
         roomStore.push_back(object);
         emit RoomReady(object);

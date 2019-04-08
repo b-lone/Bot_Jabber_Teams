@@ -9,8 +9,13 @@ class QJsonObject;
 class BotWebhook : public BotObject
 {
 public:
-    BotWebhook() = default;
+    typedef std::shared_ptr<BotWebhook> PTR;
+    static PTR New(QJsonObject * jsonObject);
+
+    BotWebhook(QObject *parent = nullptr);
     BotWebhook(QJsonObject * jsonObject);
+
+    void InitByJson(QJsonObject * jsonObject);
 
     std::shared_ptr<QJsonObject> Wrap();
 

@@ -170,7 +170,7 @@ void BotServer::on_readyReadNgrok()
             auto messageId = dataObject.value("id").toString();
             messageIds.push_back(messageId);
 
-            BOTNETWORKMANAGER->sendGetMessageDetails(messageId);
+            BOTNETWORKMANAGER->sendGetDetails(RequestType::messages, messageId);
         }
     }
 //    auto tcpClient = nrh->GetTcpSocket();

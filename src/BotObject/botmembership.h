@@ -9,8 +9,14 @@ class QJsonObject;
 class BotMembership : public BotObject
 {
 public:
+    typedef std::shared_ptr<BotMembership> PTR;
+    static PTR New(QJsonObject * jsonObject);
+
     //init by json
+    BotMembership(QObject *parent = nullptr);
     BotMembership(QJsonObject *jsonObject);
+
+    void InitByJson(QJsonObject * jsonObject);
 
     virtual QString Describe();
 

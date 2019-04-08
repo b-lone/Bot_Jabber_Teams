@@ -3,7 +3,24 @@
 #include <QJsonObject>
 #include <QDebug>
 
+BotMembership::PTR BotMembership::New(QJsonObject *jsonObject)
+{
+    PTR ptr(new BotMembership);
+    ptr->InitByJson(jsonObject);
+    return ptr;
+}
+
+BotMembership::BotMembership(QObject *parent):BotObject (parent)
+{
+
+}
+
 BotMembership::BotMembership(QJsonObject *jsonObject)
+{
+    InitByJson(jsonObject);
+}
+
+void BotMembership::InitByJson(QJsonObject *jsonObject)
 {
     if(jsonObject){
         this->id = jsonObject->value("id").toString();

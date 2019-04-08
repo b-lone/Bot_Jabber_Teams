@@ -8,6 +8,7 @@
 
 class QJsonObject;
 class QByteArray;
+bool ParseBytesToJson(std::shared_ptr<QByteArray> bytes, QJsonObject * jsonObject);
 bool ParseBytesToJson(const QByteArray & bytes, QJsonObject * jsonObject);
 
 #endif // BOTCOMMON_H

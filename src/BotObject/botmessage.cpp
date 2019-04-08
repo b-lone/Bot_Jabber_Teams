@@ -4,7 +4,24 @@
 #include <QJsonArray>
 #include <QDebug>
 
+BotMessage::PTR BotMessage::New(QJsonObject *jsonObject)
+{
+    PTR ptr(new BotMessage);
+    ptr->InitByJson(jsonObject);
+    return ptr;
+}
+
+BotMessage::BotMessage(QObject *parent): BotObject (parent)
+{
+
+}
+
 BotMessage::BotMessage(QJsonObject *jsonObject)
+{
+    InitByJson(jsonObject);
+}
+
+void BotMessage::InitByJson(QJsonObject *jsonObject)
 {
     if(jsonObject)
     {

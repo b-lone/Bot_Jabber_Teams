@@ -8,12 +8,13 @@ class BotRoom : public BotObject
 {
 public:
     typedef std::shared_ptr<BotRoom> PTR;
+    static PTR New(QJsonObject * jsonObject);
 
     //init by json
     BotRoom(QObject *parent = nullptr);
-    BotRoom(QJsonObject  * jsonObject);
+    BotRoom(QJsonObject * jsonObject);
 
-    void InitFromJson(QJsonObject * jsonObject);
+    void InitByJson(QJsonObject * jsonObject);
 
     virtual QString Describe();
 

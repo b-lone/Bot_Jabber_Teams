@@ -2,6 +2,7 @@
 #define BOTWEBHOOKCONTROLLER_H
 
 #include <QObject>
+
 #include <QString>
 
 class BotWebhookController : public QObject
@@ -9,6 +10,7 @@ class BotWebhookController : public QObject
     Q_OBJECT
 public:
     static BotWebhookController * Instance();
+
 private:
     explicit BotWebhookController(QObject *parent = nullptr);
 

@@ -2,7 +2,9 @@
 #define BOTMAINWINDOW_H
 
 #include <QMainWindow>
+#include <memory>
 class QProcess;
+class BotNetworkController;
 
 namespace Ui {
 class BotMainWindow;
@@ -73,6 +75,7 @@ private slots:
 private:
     Ui::BotMainWindow *ui;
     QProcess * ngrok = nullptr;
+    BotNetworkController *networkController;
 };
 
 #endif // BOTMAINWINDOW_H

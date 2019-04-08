@@ -3,7 +3,24 @@
 #include <QJsonObject>
 #include <QDebug>
 
+BotWebhook::PTR BotWebhook::New(QJsonObject *jsonObject)
+{
+    PTR ptr(new BotWebhook);
+    ptr->InitByJson(jsonObject);
+    return ptr;
+}
+
+BotWebhook::BotWebhook(QObject *parent):BotObject (parent)
+{
+
+}
+
 BotWebhook::BotWebhook(QJsonObject *jsonObject)
+{
+    InitByJson(jsonObject);
+}
+
+void BotWebhook::InitByJson(QJsonObject *jsonObject)
 {
     if(jsonObject){
         this->id = jsonObject->value("id").toString();
@@ -25,8 +42,8 @@ std::shared_ptr<QJsonObject> BotWebhook::Wrap()
     jsonObjectPtr->insert("targetUrl", this->targetUrl);
     jsonObjectPtr->insert("resource", this->resource);
     jsonObjectPtr->insert("event", this->event);
-//    jsonObjectPtr->insert("filter", this->filter);
-//    jsonObjectPtr->insert("secret", this->secret);
+    //    jsonObjectPtr->insert("filter", this->filter);
+    //    jsonObjectPtr->insert("secret", this->secret);
     return jsonObjectPtr;
 }
 

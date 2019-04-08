@@ -11,6 +11,7 @@
 #include "botwebhook.h"
 #include "botmessage.h"
 #include "botcommon.h"
+#include "botnetworkcontroller.h"
 
 BotMainWindow::BotMainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -19,6 +20,9 @@ BotMainWindow::BotMainWindow(QWidget *parent) :
     ui->setupUi(this);
     runNgrok();
     BOTSERVER->Listen();
+
+    networkController = new BotNetworkController(this);
+    connect(BOTNETWORKMANAGER, &BotNetworkManager::dataReady, networkController, &BotNetworkController::on_dataReady);
 }
 
 BotMainWindow::~BotMainWindow()
@@ -99,7 +103,8 @@ void BotMainWindow::on_btnAddMem_clicked()
 
 void BotMainWindow::on_btnMembership_clicked()
 {
-    BOTNETWORKMANAGER->sendGetMembership("Y2lzY29zcGFyazovL3VzL01FTUJFUlNISVAvN2U2MDlmNGMtYTQyYi00Mjc4LWE1NmYtMzM1ZjYxOTA1NzAwOjNkMWJlMTA1LWVkYWItM2RjYi1hYTM1LTE3ZjU1OGQ4NmEyNQ");
+    BOTNETWORKMANAGER->sendGetDetails(RequestType::memberships,
+                                      "Y2lzY29zcGFyazovL3VzL01FTUJFUlNISVAvN2U2MDlmNGMtYTQyYi00Mjc4LWE1NmYtMzM1ZjYxOTA1NzAwOjNkMWJlMTA1LWVkYWItM2RjYi1hYTM1LTE3ZjU1OGQ4NmEyNQ");
 }
 
 void BotMainWindow::on_btnUpdateMem_clicked()
@@ -110,7 +115,8 @@ void BotMainWindow::on_btnUpdateMem_clicked()
 
 void BotMainWindow::on_btnDeleteMem_clicked()
 {
-    BOTNETWORKMANAGER->sendDeleteMembership("Y2lzY29zcGFyazovL3VzL01FTUJFUlNISVAvYTEyYWI3MjEtY2VhZS00NTBmLTkwN2EtZmI2OTRkNWE4Nzk5OjdjZTcwZDgwLTRhMTAtMTFlOS04NTlhLTlkMDBiNjg0ZTRiNA");
+    BOTNETWORKMANAGER->sendDelete(RequestType::memberships,
+                                  "Y2lzY29zcGFyazovL3VzL01FTUJFUlNISVAvYTEyYWI3MjEtY2VhZS00NTBmLTkwN2EtZmI2OTRkNWE4Nzk5OjdjZTcwZDgwLTRhMTAtMTFlOS04NTlhLTlkMDBiNjg0ZTRiNA");
 }
 
 void BotMainWindow::on_btnListMsg_clicked()
@@ -139,12 +145,13 @@ void BotMainWindow::on_btnCreateMsg_clicked()
 
 void BotMainWindow::on_btnGetMsg_clicked()
 {
-    BOTNETWORKMANAGER->sendGetMessageDetails("Y2lzY29zcGFyazovL3VzL01FU1NBR0UvNDAyOTBkYTAtNDNkOC0xMWU5LTlmY2QtYWJmM2QwMDA3NDIx");
+    BOTNETWORKMANAGER->sendGetDetails(RequestType::messages,
+                                      "Y2lzY29zcGFyazovL3VzL01FU1NBR0UvNDAyOTBkYTAtNDNkOC0xMWU5LTlmY2QtYWJmM2QwMDA3NDIx");
 }
 
 void BotMainWindow::on_btnDeleteMsg_clicked()
 {
-    BOTNETWORKMANAGER->sendDeleteMessage("Y2lzY29zcGFyazovL3VzL01FU1NBR0UvMTA3NDM0ZDAtNGJkMS0xMWU5LTliYjMtODE0YzI2MDRhOWE3");
+    BOTNETWORKMANAGER->sendDelete(RequestType::messages, "Y2lzY29zcGFyazovL3VzL01FU1NBR0UvMTA3NDM0ZDAtNGJkMS0xMWU5LTliYjMtODE0YzI2MDRhOWE3");
 }
 
 void BotMainWindow::on_btnListPeople_clicked()
@@ -158,8 +165,9 @@ void BotMainWindow::on_btnListPeople_clicked()
 
 void BotMainWindow::on_btnGetPersonDetails_clicked()
 {
-    BOTNETWORKMANAGER->sendGetPersonDetails("Y2lzY29zcGFyazovL3VzL1BFT1BMRS8zMDhmNmI4My1hOGFjLTQyNzItYjg5NS03NGIyYzY5NDQ1MTc");
-    BOTNETWORKMANAGER->sendGetPersonDetails("me");
+    BOTNETWORKMANAGER->sendGetDetails(RequestType::people,
+                                      "Y2lzY29zcGFyazovL3VzL1BFT1BMRS8zMDhmNmI4My1hOGFjLTQyNzItYjg5NS03NGIyYzY5NDQ1MTc");
+    BOTNETWORKMANAGER->sendGetDetails(RequestType::people, "me");
 }
 
 void BotMainWindow::on_btnCreateRoom_clicked()
@@ -169,7 +177,8 @@ void BotMainWindow::on_btnCreateRoom_clicked()
 
 void BotMainWindow::on_btnGetRoomDetails_clicked()
 {
-    BOTNETWORKMANAGER->sendGetRoomDetails("Y2lzY29zcGFyazovL3VzL1JPT00vN2NlNzBkODAtNGExMC0xMWU5LTg1OWEtOWQwMGI2ODRlNGI0");
+    BOTNETWORKMANAGER->sendGetDetails(RequestType::rooms,
+                                      "Y2lzY29zcGFyazovL3VzL1JPT00vN2NlNzBkODAtNGExMC0xMWU5LTg1OWEtOWQwMGI2ODRlNGI0");
 }
 
 void BotMainWindow::on_btnUpdateRoom_clicked()
@@ -179,7 +188,8 @@ void BotMainWindow::on_btnUpdateRoom_clicked()
 
 void BotMainWindow::on_btnDeleteRoom_clicked()
 {
-    BOTNETWORKMANAGER->sendDeleteRoom("Y2lzY29zcGFyazovL3VzL1JPT00vOTRmNmZkMTAtNGM3NS0xMWU5LWI2NGUtNzFhNmQ5ZTMzODAz");
+    BOTNETWORKMANAGER->sendDelete(RequestType::rooms,
+                                  "Y2lzY29zcGFyazovL3VzL1JPT00vOTRmNmZkMTAtNGM3NS0xMWU5LWI2NGUtNzFhNmQ5ZTMzODAz");
 }
 
 void BotMainWindow::on_btnListWebhooks_clicked()
@@ -200,7 +210,8 @@ void BotMainWindow::on_btnCreateWebhook_clicked()
 
 void BotMainWindow::on_btnWebhookDetails_clicked()
 {
-    BOTNETWORKMANAGER->sendGetWebhookDetails("Y2lzY29zcGFyazovL3VzL1dFQkhPT0svZTUwZThkMTctYzc3Ny00Mjc5LTgwNTctODkwMTU4MzIwYmU0");
+    BOTNETWORKMANAGER->sendGetDetails(RequestType::webhooks,
+                                      "Y2lzY29zcGFyazovL3VzL1dFQkhPT0svZTUwZThkMTctYzc3Ny00Mjc5LTgwNTctODkwMTU4MzIwYmU0");
 }
 
 void BotMainWindow::on_btnUpdateWebhook_clicked()
@@ -210,7 +221,7 @@ void BotMainWindow::on_btnUpdateWebhook_clicked()
 
 void BotMainWindow::on_btnDeleteWebhook_clicked()
 {
-    BOTNETWORKMANAGER->sendDeleteWebhook("Y2lzY29zcGFyazovL3VzL1dFQkhPT0svZWMxZTFhYTQtZjA3NS00MjE3LTkzODUtZDA4M2ZjY2VhNTBi");
+    BOTNETWORKMANAGER->sendDelete(RequestType::webhooks, "Y2lzY29zcGFyazovL3VzL1dFQkhPT0svZWMxZTFhYTQtZjA3NS00MjE3LTkzODUtZDA4M2ZjY2VhNTBi");
 }
 
 void BotMainWindow::on_btnNgrok_clicked()

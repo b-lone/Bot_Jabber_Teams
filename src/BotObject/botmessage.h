@@ -11,9 +11,14 @@ class QJsonObject;
 class BotMessage : public BotObject
 {
 public:
+    typedef std::shared_ptr<BotMessage> PTR;
+    static PTR New(QJsonObject * jsonObject);
+
     //init by json
-    BotMessage() = default;
+    BotMessage(QObject *parent = nullptr);
     BotMessage(QJsonObject *jsonObject);
+
+    void InitByJson(QJsonObject * jsonObject);
 
     virtual QString Describe();
 
