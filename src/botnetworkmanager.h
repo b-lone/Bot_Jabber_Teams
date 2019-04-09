@@ -9,12 +9,16 @@ class QNetworkAccessManager;
 ;
 class BotWebhook;
 class BotMessage;
+class BotNetworkController;
 
 class BotNetworkManager : public QObject
 {
     Q_OBJECT
 public:
     static BotNetworkManager * Instance();
+
+    BotNetworkController * getNetworkController() { return networkController; }
+
     void sendGetNgrokInfo();
     //---------------Memberships----------------------------------
     //https://developer.webex.com/docs/api/v1/memberships/list-memberships
@@ -106,6 +110,7 @@ private:
 
 private:
     std::shared_ptr<QNetworkAccessManager> networkAccessManager;
+    BotNetworkController *networkController;
 };
 
 #define BOTNETWORKMANAGER BotNetworkManager::Instance()

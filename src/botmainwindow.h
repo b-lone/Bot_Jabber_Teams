@@ -69,9 +69,10 @@ private slots:
 
     void on_btnNgrok_clicked();
 
+    void on_btnWebhookDialog_clicked();
+
 private:
     Ui::BotMainWindow *ui;
-    BotNetworkController *networkController;
     BotProcessHelper *processHelper;
 };
 

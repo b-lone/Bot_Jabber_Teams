@@ -17,6 +17,9 @@ class BotStore : public QObject
 public:
     static BotStore * Instance();
 
+    const std::vector<std::shared_ptr<BotWebhook>> & getWebhooks() { return webhookStore; }
+    std::shared_ptr<BotWebhook> getWebhookById(QString id);
+
     void PushMessage(std::shared_ptr<BotMessage> object);
     void PushRoom(std::shared_ptr<BotRoom> object);
     void PushMembership(std::shared_ptr<BotMembership> object);
@@ -31,7 +34,10 @@ signals:
    void RoomReady(std::shared_ptr<BotRoom>);
    void MembershipReady(std::shared_ptr<BotMembership>);
    void PeopleReady(std::shared_ptr<BotPeople>);
-   void WebhookReady(std::shared_ptr<BotWebhook>);
+   void WebhookReady();
+
+public slots:
+   void on_webhookListReady(std::vector<std::shared_ptr<BotWebhook>> objects);
 
 private:
     std::vector<std::shared_ptr<BotRoom>> roomStore;

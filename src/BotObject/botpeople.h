@@ -20,7 +20,6 @@ public:
 
     //init by json
     BotPeople(QObject *parent = nullptr);
-    BotPeople(QJsonObject *jsonObject);
 
     void InitByJson(QJsonObject * jsonObject);
 

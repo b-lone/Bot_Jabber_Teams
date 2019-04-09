@@ -15,11 +15,6 @@ BotRoom::BotRoom(QObject *parent):BotObject (parent)
 {
 }
 
-BotRoom::BotRoom(QJsonObject *jsonObject)
-{
-    InitByJson(jsonObject);
-}
-
 void BotRoom::InitByJson(QJsonObject *jsonObject)
 {
     if(jsonObject){

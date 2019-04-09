@@ -13,7 +13,6 @@ public:
     static PTR New(QJsonObject * jsonObject);
 
     BotWebhook(QObject *parent = nullptr);
-    BotWebhook(QJsonObject * jsonObject);
 
     void InitByJson(QJsonObject * jsonObject);
 
@@ -27,7 +26,7 @@ public:
     QString event;
     QString filter;
     QString secret;
-    QString status;
+    QString status;// active inactive
     QString created;
 };
 

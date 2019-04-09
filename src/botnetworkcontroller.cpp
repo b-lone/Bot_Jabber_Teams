@@ -19,89 +19,187 @@ void BotNetworkController::on_dataReady(std::shared_ptr<QByteArray> data, Reques
 {
     BOTLOG("Recive http data.");
 
+
     QJsonObject * jsonObject = new QJsonObject;
     if(ParseBytesToJson(data, jsonObject)){
-        if(jsonObject->contains("items")){
-            BOTLOG("Multi objects.");
-            QJsonArray subArray = jsonObject->value("items").toArray();
-            if(subArray.count()){
-                for (int i = 0; i< subArray.size(); i++) {
-                    QJsonObject subObject = subArray[i].toObject();
-                    Distribute(&subObject, requestType);
-                }
-            }else{
-                emit emptyList(requestType);
-            }
-        }else {
-            BOTLOG("Single object.");
-            Distribute(jsonObject, requestType);
+        switch (requestType) {
+        case RequestType::rooms:
+            RoomRoot(jsonObject);
+            break;
+        case RequestType::people:
+            PeopleRoot(jsonObject);
+            break;
+        case RequestType::messages:
+            MessageRoot(jsonObject);
+            break;
+        case RequestType::webhooks:
+            WebhookRoot(jsonObject);
+            break;
+        case RequestType::memberships:
+            MembershipRoot(jsonObject);
+            break;
         }
     }
     delete  jsonObject;
 }
 
-void BotNetworkController::Distribute(QJsonObject *jsonObject, RequestType requestType)
+void BotNetworkController::RoomRoot(QJsonObject *jsonObject)
 {
-    switch (requestType) {
-    case RequestType::rooms:
+    if(jsonObject->contains("items")){
         Rooms(jsonObject);
-        break;
-    case RequestType::people:
-        People(jsonObject);
-        break;
-    case RequestType::messages:
-        Messages(jsonObject);
-        break;
-    case RequestType::webhooks:
-        Webhooks(jsonObject);
-        break;
-    case RequestType::memberships:
-        Memberships(jsonObject);
-        break;
+    }else {
+        Room(jsonObject);
     }
+}
+
+void BotNetworkController::PeopleRoot(QJsonObject *jsonObject)
+{
+    if(jsonObject->contains("items")){
+        People(jsonObject);
+    }else {
+        Person(jsonObject);
+    }
+}
+
+void BotNetworkController::MessageRoot(QJsonObject *jsonObject)
+{
+    if(jsonObject->contains("items")){
+        Messages(jsonObject);
+    }else {
+        Message(jsonObject);
+    }
+}
+
+void BotNetworkController::WebhookRoot(QJsonObject *jsonObject)
+{
+    if(jsonObject->contains("items")){
+        Webhooks(jsonObject);
+    }else {
+        Webhook(jsonObject);
+    }
+}
+
+void BotNetworkController::MembershipRoot(QJsonObject *jsonObject)
+{
+    if(jsonObject->contains("items")){
+        Memberships(jsonObject);
+    }else {
+        Membership(jsonObject);
+    }
+}
+
+template<class T>
+std::shared_ptr<T> BotNetworkController::GenerateObject(QJsonObject *jsonObject)
+{
+    if(jsonObject){
+        std::shared_ptr<T> object = T::New(jsonObject);
+        return object;
+    }
+    return nullptr;
+}
+
+template<class T>
+std::vector<std::shared_ptr<T>> BotNetworkController::GenerateObjects(QJsonObject *jsonObject)
+{
+    std::vector<std::shared_ptr<T>> result;
+    if(jsonObject){
+        QJsonArray subArray = jsonObject->value("items").toArray();
+        for (int i = 0; i< subArray.size(); i++) {
+            QJsonObject subObject = subArray[i].toObject();
+            auto object = GenerateObject<T>(&subObject);
+            result.push_back(object);
+        }
+        return result;
+    }
+    return result;
 }
 
 void BotNetworkController::Rooms(QJsonObject *jsonObject)
 {
-    BOTLOG("New room object.");
+    BOTLOG("Rooms");
     if(jsonObject){
-        BotRoom::PTR object = BotRoom::New(jsonObject);
-        emit roomReady(object);
+        auto objects = GenerateObjects<BotRoom>(jsonObject);
+        emit roomListReady(objects);
     }
 }
 
 void BotNetworkController::People(QJsonObject *jsonObject)
 {
-    BOTLOG("New people object.");
+    BOTLOG("People");
     if(jsonObject){
-        BotPeople::PTR object = BotPeople::New(jsonObject);
-        emit peopleReady(object);
+        auto objects = GenerateObjects<BotPeople>(jsonObject);
+        emit peopleListReady(objects);
     }
 }
 
 void BotNetworkController::Messages(QJsonObject *jsonObject)
 {
-    BOTLOG("New message object.");
+    BOTLOG("Messages");
     if(jsonObject){
-        BotMessage::PTR object = BotMessage::New(jsonObject);
-        emit messageReady(object);
+        auto objects = GenerateObjects<BotMessage>(jsonObject);
+        emit messageListReady(objects);
     }
 }
 
 void BotNetworkController::Webhooks(QJsonObject *jsonObject)
 {
-    BOTLOG("New webhook object.");
+    BOTLOG("Webhooks");
     if(jsonObject){
-        BotWebhook::PTR object = BotWebhook::New(jsonObject);
-        emit webhookReady(object);
+        auto objects = GenerateObjects<BotWebhook>(jsonObject);
+        emit webhookListReady(objects);
     }
 }
 
 void BotNetworkController::Memberships(QJsonObject *jsonObject)
 {
-    BOTLOG("New membership object.");
+    BOTLOG("Memberships");
     if(jsonObject){
-        BotMembership::PTR object = BotMembership::New(jsonObject);
+        auto objects = GenerateObjects<BotMembership>(jsonObject);
+        emit membershipListReady(objects);
+    }
+}
+
+void BotNetworkController::Room(QJsonObject *jsonObject)
+{
+    BOTLOG("Room");
+    if(jsonObject){
+        auto object = GenerateObject<BotRoom>(jsonObject);
+        emit roomReady(object);
+    }
+}
+
+void BotNetworkController::Person(QJsonObject *jsonObject)
+{
+    BOTLOG("Person");
+    if(jsonObject){
+        auto object = GenerateObject<BotPeople>(jsonObject);
+        emit peopleReady(object);
+    }
+}
+
+void BotNetworkController::Message(QJsonObject *jsonObject)
+{
+    BOTLOG("Message");
+    if(jsonObject){
+        auto object = GenerateObject<BotMessage>(jsonObject);
+        emit messageReady(object);
+    }
+}
+
+void BotNetworkController::Webhook(QJsonObject *jsonObject)
+{
+    BOTLOG("Webhook");
+    if(jsonObject){
+        auto object = GenerateObject<BotWebhook>(jsonObject);
+        emit webhookReady(object);
+    }
+}
+
+void BotNetworkController::Membership(QJsonObject *jsonObject)
+{
+    BOTLOG("Membership");
+    if(jsonObject){
+        auto object = GenerateObject<BotMembership>(jsonObject);
         emit membershipReady(object);
     }
 }

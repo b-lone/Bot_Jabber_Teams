@@ -12,6 +12,7 @@
 #include "botcommon.h"
 #include "botnetworkcontroller.h"
 #include "botprocesshelper.h"
+#include "botwebhooksdialog.h"
 
 BotMainWindow::BotMainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -19,9 +20,6 @@ BotMainWindow::BotMainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     BOTSERVER->Listen();
-
-    networkController = new BotNetworkController(this);
-    connect(BOTNETWORKMANAGER, &BotNetworkManager::dataReady, networkController, &BotNetworkController::on_dataReady);
 
     processHelper = new BotProcessHelper(this);
     connect(processHelper, &BotProcessHelper::errorOccurred, this, &BotMainWindow::showMessages);
@@ -189,4 +187,10 @@ void BotMainWindow::on_btnDeleteWebhook_clicked()
 void BotMainWindow::on_btnNgrok_clicked()
 {
     BOTNETWORKMANAGER->sendGetNgrokInfo();
+}
+
+void BotMainWindow::on_btnWebhookDialog_clicked()
+{
+    BotWebhooksDialog * dlg = new BotWebhooksDialog(this);
+    dlg->show();
 }

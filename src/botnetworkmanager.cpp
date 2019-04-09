@@ -14,12 +14,16 @@
 #include "botwebhook.h"
 #include "botmessage.h"
 #include "botcommon.h"
+#include "botnetworkcontroller.h"
 
 
 //BotNetworkManager
 BotNetworkManager::BotNetworkManager()
 {
     networkAccessManager = std::make_shared<QNetworkAccessManager>(this);
+
+    networkController = new BotNetworkController(this);
+    connect(this, &BotNetworkManager::dataReady, networkController, &BotNetworkController::on_dataReady);
 }
 
 BotNetworkManager *BotNetworkManager::Instance()

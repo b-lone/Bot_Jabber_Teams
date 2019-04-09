@@ -6,6 +6,8 @@
 #include "botpeople.h"
 #include "botwebhook.h"
 #include "botcommon.h"
+#include "botnetworkmanager.h"
+#include "botnetworkcontroller.h"
 
 BotStore *BotStore::Instance()
 {
@@ -13,8 +15,18 @@ BotStore *BotStore::Instance()
     return store;
 }
 
+std::shared_ptr<BotWebhook> BotStore::getWebhookById(QString id)
+{
+    auto itr = std::find_if(webhookStore.begin(), webhookStore.end(), [&](std::shared_ptr<BotWebhook> object){
+        return object->id == id;
+    });
+    return *itr;
+}
+
 BotStore::BotStore(QObject *parent) : QObject(parent)
 {
+    auto networkController = BOTNETWORKMANAGER->getNetworkController();
+    connect(networkController, &BotNetworkController::webhookListReady, this, &BotStore::on_webhookListReady);
 
 }
 
@@ -67,8 +79,15 @@ void BotStore::PushWebhook(std::shared_ptr<BotWebhook> object)
     if (std::find_if(webhookStore.begin(), webhookStore.end(), [&](std::shared_ptr<BotWebhook> item){return (item->id == object->id);}) == webhookStore.end()) {
         BOTLOG("Add new object:" << object->name);
         webhookStore.push_back(object);
-        emit WebhookReady(object);
+        //emit WebhookReady(object);
     }else {
         BOTLOG("Already exist!");
     }
+}
+
+void BotStore::on_webhookListReady(std::vector<std::shared_ptr<BotWebhook>> objects)
+{
+    BOTLOG("on_webhookListReady");
+    webhookStore = objects;
+    emit WebhookReady();
 }

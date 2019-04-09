@@ -15,11 +15,6 @@ BotMembership::BotMembership(QObject *parent):BotObject (parent)
 
 }
 
-BotMembership::BotMembership(QJsonObject *jsonObject)
-{
-    InitByJson(jsonObject);
-}
-
 void BotMembership::InitByJson(QJsonObject *jsonObject)
 {
     if(jsonObject){

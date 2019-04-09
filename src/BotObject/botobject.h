@@ -11,7 +11,7 @@ class BotObject : public QObject
 public:
     typedef  std::shared_ptr<BotObject> PTR;
     
-    explicit BotObject(QObject *parent = nullptr);
+    BotObject(QObject *parent = nullptr);
 
     virtual ~BotObject() = default;
 

@@ -12,7 +12,6 @@ public:
 
     //init by json
     BotRoom(QObject *parent = nullptr);
-    BotRoom(QJsonObject * jsonObject);
 
     void InitByJson(QJsonObject * jsonObject);
 

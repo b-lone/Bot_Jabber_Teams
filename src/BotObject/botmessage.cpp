@@ -16,11 +16,6 @@ BotMessage::BotMessage(QObject *parent): BotObject (parent)
 
 }
 
-BotMessage::BotMessage(QJsonObject *jsonObject)
-{
-    InitByJson(jsonObject);
-}
-
 void BotMessage::InitByJson(QJsonObject *jsonObject)
 {
     if(jsonObject)

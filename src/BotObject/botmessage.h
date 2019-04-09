@@ -16,7 +16,6 @@ public:
 
     //init by json
     BotMessage(QObject *parent = nullptr);
-    BotMessage(QJsonObject *jsonObject);
 
     void InitByJson(QJsonObject * jsonObject);
 

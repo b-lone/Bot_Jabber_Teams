@@ -14,7 +14,6 @@ public:
 
     //init by json
     BotMembership(QObject *parent = nullptr);
-    BotMembership(QJsonObject *jsonObject);
 
     void InitByJson(QJsonObject * jsonObject);
 
