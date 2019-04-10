@@ -19,7 +19,6 @@ void BotNetworkController::on_dataReady(std::shared_ptr<QByteArray> data, Reques
 {
     BOTLOG("Recive http data.");
 
-
     QJsonObject * jsonObject = new QJsonObject;
     if(ParseBytesToJson(data, jsonObject)){
         switch (requestType) {
@@ -41,6 +40,27 @@ void BotNetworkController::on_dataReady(std::shared_ptr<QByteArray> data, Reques
         }
     }
     delete  jsonObject;
+}
+
+void BotNetworkController::on_ngrokReady(std::shared_ptr<QByteArray> data)
+{
+    BOTLOG("Recive ngrok data.");
+
+    QJsonObject * jsonObject = new QJsonObject;
+    if(ParseBytesToJson(data, jsonObject)){
+        if(jsonObject->contains("tunnels")){
+            QJsonArray subArray = jsonObject->value("tunnels").toArray();
+            for (int i = 0; i< subArray.size(); i++) {
+                QJsonObject subObject = subArray[i].toObject();
+                if(subObject.value("proto").toString() == "https"){
+                    auto public_url = subObject.value("public_url").toString();
+                    BOTLOG(public_url);
+                    emit ngrokUrlReady(public_url);
+                    break;
+                }
+            }
+        }
+    }
 }
 
 void BotNetworkController::RoomRoot(QJsonObject *jsonObject)

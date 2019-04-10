@@ -94,6 +94,7 @@ public:
 
 signals:
     void dataReady(std::shared_ptr<QByteArray>, RequestType);
+    void readyWithoutData(RequestType);
     void ngrokReady(std::shared_ptr<QByteArray>);
 
 private slots:

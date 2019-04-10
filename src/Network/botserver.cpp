@@ -90,7 +90,7 @@ BotServer::BotServer()
 {
     serverNgrok = std::make_shared<QTcpServer>();
     connect(serverNgrok.get(), &QTcpServer::newConnection, this, &BotServer::on_newConnectionNgrok);
-    connect(BOTSTORE, &BotStore::MessageReady, this, &BotServer::OnNewMessage);
+//    connect(BOTSTORE, &BotStore::messageReady, this, &BotServer::OnNewMessage);
 
     serverAutomation = std::make_shared<QTcpServer>();
     connect(serverAutomation.get(), &QTcpServer::newConnection, this, &BotServer::on_newConnectionAutomation);
@@ -209,7 +209,7 @@ void BotServer::on_readyReadNgrok()
 }
 void BotServer::on_disconnectedNgrok()
 {
-    BOTLOG("disconnected.");
+    BOTLOG("Disconnected.");
 //    tcpClientNgrok.removeOne(nrh->GetTcpSocket());
     for(int i=0; i<tcpClientNgrok.length(); i++)
     {
@@ -224,25 +224,42 @@ void BotServer::on_disconnectedNgrok()
 void BotServer::on_newConnectionAutomation()
 {
     BOTLOG("New Connection!");
-    std::shared_ptr<QTcpSocket> currentClient(serverAutomation->nextPendingConnection());
+
+    auto currentClient = serverAutomation->nextPendingConnection();
     tcpClientAutomation.append(currentClient);
 
-    BotTcpSocketHelper * tsh = new BotTcpSocketHelper(currentClient.get());
-    connect(tsh, &BotTcpSocketHelper::readyRead, this, &BotServer::on_readyReadAutomation);
-    connect(tsh, &BotTcpSocketHelper::disconnected, this, &BotServer::on_disconnectedNgrok);
+    connect(currentClient, &QTcpSocket::readyRead, this, &BotServer::on_readyReadAutomation);
+    connect(currentClient, &QTcpSocket::disconnected, this, &BotServer::on_disconnectedAutomation);
+
+//    BOTLOG("New Connection!");
+//    std::shared_ptr<QTcpSocket> currentClient(serverAutomation->nextPendingConnection());
+//    tcpClientAutomation.append(currentClient);
+
+//    BotTcpSocketHelper * tsh = new BotTcpSocketHelper(currentClient.get());
+//    connect(tsh, &BotTcpSocketHelper::readyRead, this, &BotServer::on_readyReadAutomation);
+//    connect(tsh, &BotTcpSocketHelper::disconnected, this, &BotServer::on_disconnectedAutomation);
 }
 
-void BotServer::on_readyReadAutomation(BotTcpSocketHelper *nrh)
+void BotServer::on_readyReadAutomation()
 {
-    auto tcpClient = nrh->GetTcpSocket();
+    BOTLOG("New Automation Message.");
 
-    QByteArray buffer = tcpClient->readAll();
-    if(buffer.isEmpty())
-        return;
-    BOTLOG("buffer");
+    for (int i = 0; i < tcpClientAutomation.count(); ++i) {
+        QByteArray buffer = tcpClientAutomation[i]->readAll();
+        if(buffer.isEmpty())
+            continue;
+    }
 }
 
-void BotServer::on_disconnectedAutomation(BotTcpSocketHelper *nrh)
+void BotServer::on_disconnectedAutomation()
 {
-    tcpClientAutomation.removeOne(nrh->GetTcpSocket());
+    BOTLOG("Disconnected.");
+    for(int i=0; i<tcpClientAutomation.length(); i++)
+    {
+        if(tcpClientAutomation[i]->state() == QAbstractSocket::UnconnectedState)
+        {
+            // 删除存储在tcpClient列表中的客户端信息
+            tcpClientAutomation.removeAt(i);
+        }
+    }
 }

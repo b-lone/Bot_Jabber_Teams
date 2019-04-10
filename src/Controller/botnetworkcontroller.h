@@ -31,8 +31,11 @@ signals:
     void webhookListReady(std::vector<std::shared_ptr<BotWebhook>>);
     void membershipListReady(std::vector<std::shared_ptr<BotMembership>>);
 
+    void ngrokUrlReady(QString);
+
 public slots:
     void on_dataReady(std::shared_ptr<QByteArray> data, RequestType requestType);
+    void on_ngrokReady(std::shared_ptr<QByteArray> data);
     
 private:
     void RoomRoot(QJsonObject * jsonObject);

@@ -24,6 +24,7 @@ BotNetworkManager::BotNetworkManager()
 
     networkController = new BotNetworkController(this);
     connect(this, &BotNetworkManager::dataReady, networkController, &BotNetworkController::on_dataReady);
+    connect(this, &BotNetworkManager::ngrokReady, networkController, &BotNetworkController::on_ngrokReady);
 }
 
 BotNetworkManager *BotNetworkManager::Instance()
@@ -85,7 +86,7 @@ void BotNetworkManager::sendUpdateMembership(QString membershipId, bool isModera
     networkRequestHelper->setContentType(BotNetworkRepquestHelper::contentType_Json);
 
     QJsonObject jsonObject;
-    jsonObject.insert("isModerator", isModerator);   
+    jsonObject.insert("isModerator", isModerator);
     networkRequestHelper->setBodyByte(jsonObject);
 
     SendAndConnect(networkRequestHelper);
@@ -330,9 +331,12 @@ void BotNetworkManager::on_GetNgrokInfo(BotNetworkReplyHelper *nrh)
 void BotNetworkManager::on_finished(BotNetworkReplyHelper *nrh)
 {
     auto reply = nrh->GetNetworkReply();
-    if(ParseReplyResult(reply) == 200){
+    auto result = ParseReplyResult(reply);
+    if (result == 200) {
         std::shared_ptr<QByteArray> data(new QByteArray(reply->readAll()));
         emit dataReady(data, nrh->getRequestType());
+    }else if (result == 204) {
+        emit readyWithoutData(nrh->getRequestType());
     }
     reply->deleteLater();
 }

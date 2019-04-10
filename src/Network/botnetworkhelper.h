@@ -8,7 +8,7 @@ class QNetworkReply;
 class QNetworkRequest;
 class QHttpMultiPart;
 
-enum RequestType{
+enum RequestType : unsigned char{
     memberships = 0,
     messages,
     people,

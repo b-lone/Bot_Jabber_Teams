@@ -50,8 +50,8 @@ private slots:
     void on_disconnectedNgrok();
 
     void on_newConnectionAutomation();
-    void on_readyReadAutomation(BotTcpSocketHelper * nrh);
-    void on_disconnectedAutomation(BotTcpSocketHelper * nrh);
+    void on_readyReadAutomation();
+    void on_disconnectedAutomation();
 private:
     std::shared_ptr<QTcpServer> serverNgrok;
     QList<QTcpSocket*> tcpClientNgrok;
@@ -59,7 +59,7 @@ private:
     QVector<QString> messageIds;
 
     std::shared_ptr<QTcpServer> serverAutomation;
-    QList<std::shared_ptr<QTcpSocket>> tcpClientAutomation;
+     QList<QTcpSocket*> tcpClientAutomation;
 };
 
 #define BOTSERVER BotServer::Instance()

@@ -6,6 +6,7 @@
 #include "botstore.h"
 #include "botwebhook.h"
 #include "botnetworkmanager.h"
+#include "botnetworkcontroller.h"
 #include "botcommon.h"
 
 static int columnId = 0;
@@ -20,12 +21,17 @@ BotWebhooksDialog::BotWebhooksDialog(QWidget *parent) :
 
     UpdateTable();
     on_tableWebhooks_itemSelectionChanged();
+    ui->btnCreate->setEnabled(false);
 
-    connect(BOTSTORE, &BotStore::WebhookReady, this, &BotWebhooksDialog::UpdateTable);
+    connect(BOTSTORE, &BotStore::webhookReady, this, &BotWebhooksDialog::UpdateTable);
+    connect(BOTNETWORKMANAGER, &BotNetworkManager::readyWithoutData, this, &BotWebhooksDialog::on_deleteFinshed);
+    auto networkController = BOTNETWORKMANAGER->getNetworkController();
+    connect(networkController, &BotNetworkController::ngrokUrlReady, this, &BotWebhooksDialog::update_leUrl);
 }
 
 BotWebhooksDialog::~BotWebhooksDialog()
 {
+    BOTLOG("~BotWebhooksDialog");
     delete ui;
 }
 
@@ -68,21 +74,29 @@ void BotWebhooksDialog::on_btnDelete_clicked()
     auto selectedRows = ui->tableWebhooks->selectionModel()->selectedRows();
     auto id = ui->tableWebhooks->item(selectedRows[0].row(), columnId)->text();
     BOTLOG(id);
-    BOTNETWORKMANAGER->sendDelete(RequestType::webhooks,id);
+    BOTNETWORKMANAGER->sendDelete(RequestType::webhooks, id);
 }
 
 void BotWebhooksDialog::on_btnCreate_clicked()
 {
-
+    BOTLOG("on_btnCreate_clicked");
+    BotWebhook object;
+    object.targetUrl = ui->leUrl->text();
+    object.name = "Bot";
+    object.resource = "messages";
+    object.event = "created";
+    BOTNETWORKMANAGER->sendCreateWebhook(object);
 }
 
 void BotWebhooksDialog::on_btnGetUrl_clicked()
 {
-
+    BOTLOG("on_btnGetUrl_clicked");
+    BOTNETWORKMANAGER->sendGetNgrokInfo();
 }
 
 void BotWebhooksDialog::on_tableWebhooks_itemSelectionChanged()
 {
+    BOTLOG("on_tableWebhooks_itemSelectionChanged");
     auto selectedRows = ui->tableWebhooks->selectionModel()->selectedRows();
     if(selectedRows.count() == 0){
         ui->btnDelete->setEnabled(false);
@@ -96,4 +110,28 @@ void BotWebhooksDialog::on_tableWebhooks_itemSelectionChanged()
         }
         ui->btnDelete->setEnabled(true);
     }
+}
+
+void BotWebhooksDialog::update_leUrl(QString Url)
+{
+    BOTLOG("update_leUrl");
+    ui->leUrl->setText(Url);
+}
+
+void BotWebhooksDialog::on_leUrl_textChanged(const QString &arg1)
+{
+    if(arg1 == ""){
+        ui->btnCreate->setEnabled(false);
+    }else {
+        ui->btnCreate->setEnabled(true);
+    }
+}
+
+void BotWebhooksDialog::on_deleteFinshed(RequestType type)
+{
+    if(type != RequestType::webhooks){
+        return;
+    }
+    BOTLOG("on_deleteFinshed");
+    BOTNETWORKMANAGER->sendListWebhooks();
 }
