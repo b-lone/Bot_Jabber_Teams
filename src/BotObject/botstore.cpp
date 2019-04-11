@@ -105,9 +105,9 @@ void BotStore::on_webhookReady(std::shared_ptr<BotWebhook> object)
         emit webhookReady();
     }else {
         BOTLOG("Already exist!");
-        if((*itr)->status != object->status){
-            BOTLOG("Status Update!");
-            (*itr)->status = object->status;
+        if(*(*itr) != *object){
+            BOTLOG("Object Update!");
+            (*itr) = object;
             emit webhookReady();
         }
     }

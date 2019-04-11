@@ -12,6 +12,8 @@
 static int columnId = 0;
 static int columnTargetUrl = 1;
 static int columnStatus = 2;
+static int columnResouce = 3;
+static int columnEvent = 4;
 
 BotWebhooksDialog::BotWebhooksDialog(QWidget *parent) :
     QDialog(parent),
@@ -48,6 +50,8 @@ void BotWebhooksDialog::UpdateTable()
         table->setItem(0, columnId, new QTableWidgetItem(webhook->id));
         table->setItem(0, columnTargetUrl, new QTableWidgetItem(webhook->targetUrl));
         table->setItem(0, columnStatus, new QTableWidgetItem(webhook->status));
+        table->setItem(0, columnResouce, new QTableWidgetItem(webhook->resource));
+        table->setItem(0, columnEvent, new QTableWidgetItem(webhook->event));
     }
 }
 
@@ -83,8 +87,9 @@ void BotWebhooksDialog::on_btnCreate_clicked()
     BotWebhook object;
     object.targetUrl = ui->leUrl->text();
     object.name = "Bot";
-    object.resource = "messages";
-    object.event = "created";
+    object.resource = ui->cbResource->currentText();
+    object.event = ui->cbEvent->currentText();
+    BOTLOG(object);
     BOTNETWORKMANAGER->sendCreateWebhook(object);
 }
 

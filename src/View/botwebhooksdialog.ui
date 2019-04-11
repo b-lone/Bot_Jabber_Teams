@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>781</width>
-    <height>402</height>
+    <width>806</width>
+    <height>401</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,7 +26,7 @@
       <enum>QAbstractItemView::SelectRows</enum>
      </property>
      <attribute name="horizontalHeaderDefaultSectionSize">
-      <number>150</number>
+      <number>100</number>
      </attribute>
      <attribute name="verticalHeaderVisible">
       <bool>false</bool>
@@ -46,6 +46,16 @@
        <string>status</string>
       </property>
      </column>
+     <column>
+      <property name="text">
+       <string>resource</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>event</string>
+      </property>
+     </column>
     </widget>
    </item>
    <item>
@@ -55,7 +65,7 @@
        <property name="contextMenuPolicy">
         <enum>Qt::DefaultContextMenu</enum>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,1">
+       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0,1">
         <item>
          <widget class="QLabel" name="label">
           <property name="maximumSize">
@@ -70,7 +80,78 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="leUrl"/>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QLineEdit" name="leUrl"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnGetUrl">
+            <property name="text">
+             <string>Get Url</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,2">
+          <item>
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>resource:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="cbResource">
+            <item>
+             <property name="text">
+              <string>messages</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>memberships</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>rooms</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,2">
+          <item>
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>event:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="cbEvent">
+            <item>
+             <property name="text">
+              <string>created</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>updated</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>deleted</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -80,13 +161,6 @@
           <property name="bottomMargin">
            <number>8</number>
           </property>
-          <item>
-           <widget class="QPushButton" name="btnGetUrl">
-            <property name="text">
-             <string>Get Url</string>
-            </property>
-           </widget>
-          </item>
           <item>
            <widget class="QPushButton" name="btnCreate">
             <property name="text">

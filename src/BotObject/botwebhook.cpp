@@ -43,6 +43,25 @@ std::shared_ptr<QJsonObject> BotWebhook::Wrap()
     return jsonObjectPtr;
 }
 
+bool BotWebhook::operator ==(const BotWebhook &other)
+{
+    if(id == other.id){
+        if(status == other.status){
+            if(resource == other.resource){
+                if(event == other.event){
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+bool BotWebhook::operator !=(const BotWebhook &other)
+{
+    return  !(operator ==(other));
+}
+
 QString BotWebhook::Describe()
 {
     QString str;

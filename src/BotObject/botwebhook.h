@@ -18,6 +18,8 @@ public:
 
     std::shared_ptr<QJsonObject> Wrap();
 
+    bool operator ==(const BotWebhook & other);
+    bool operator !=(const BotWebhook & other);
     virtual QString Describe();
 
     QString name;
