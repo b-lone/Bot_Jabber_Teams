@@ -1,4 +1,4 @@
-#include "botnetworkmanager.h"
+#include "bothttpclient.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -14,37 +14,35 @@
 #include "botwebhook.h"
 #include "botmessage.h"
 #include "botcommon.h"
-#include "botnetworkcontroller.h"
+#include "bothttpclientcontroller.h"
 
 
 //BotNetworkManager
-BotNetworkManager::BotNetworkManager()
+BotHttpClient::BotHttpClient()
 {
     networkAccessManager = std::make_shared<QNetworkAccessManager>(this);
 
-    networkController = new BotNetworkController(this);
-    connect(this, &BotNetworkManager::dataReady, networkController, &BotNetworkController::on_dataReady);
-    connect(this, &BotNetworkManager::ngrokReady, networkController, &BotNetworkController::on_ngrokReady);
+    clientController = new BotHttpClientController(this);
 }
 
-BotNetworkManager *BotNetworkManager::Instance()
+BotHttpClient *BotHttpClient::Instance()
 {
-    static BotNetworkManager * botNetworkManager = new BotNetworkManager();
+    static BotHttpClient * botNetworkManager = new BotHttpClient();
     return botNetworkManager;
 }
 
-void BotNetworkManager::sendGetNgrokInfo()
+void BotHttpClient::sendGetNgrokInfo()
 {
     QNetworkRequest request(QUrl("http://localhost:4040/api/tunnels"));
     request.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader,"application/json");
 
     auto reply = networkAccessManager->get(request);
     BotNetworkReplyHelper * replyHelper = new BotNetworkReplyHelper(reply);
-    connect(replyHelper, &BotNetworkReplyHelper::finished, this, &BotNetworkManager::on_GetNgrokInfo);
+    connect(replyHelper, &BotNetworkReplyHelper::finished, this, &BotHttpClient::on_GetNgrokInfo);
 
 }
 
-void BotNetworkManager::sendGetMemberships(QString roomId, QString filterString, bool isFilterByPersonId)
+void BotHttpClient::sendGetMemberships(QString roomId, QString filterString, bool isFilterByPersonId)
 {
     auto networkRequestHelper = BotNetworkRepquestHelper::New(RequestType::memberships, SendType::Get);
     if(roomId != ""){
@@ -61,7 +59,7 @@ void BotNetworkManager::sendGetMemberships(QString roomId, QString filterString,
     SendAndConnect(networkRequestHelper);
 }
 
-void BotNetworkManager::sendCreateAMembership(QString roomId, bool isModerator, QString byString, bool isByEmail)
+void BotHttpClient::sendCreateAMembership(QString roomId, bool isModerator, QString byString, bool isByEmail)
 {
     auto networkRequestHelper = BotNetworkRepquestHelper::New(RequestType::memberships, SendType::Post);
     networkRequestHelper->setContentType(BotNetworkRepquestHelper::contentType_Json);
@@ -79,7 +77,7 @@ void BotNetworkManager::sendCreateAMembership(QString roomId, bool isModerator, 
     SendAndConnect(networkRequestHelper);
 }
 
-void BotNetworkManager::sendUpdateMembership(QString membershipId, bool isModerator)
+void BotHttpClient::sendUpdateMembership(QString membershipId, bool isModerator)
 {
     auto networkRequestHelper = BotNetworkRepquestHelper::New(RequestType::memberships, SendType::Put);
     networkRequestHelper->setObjectId(membershipId);
@@ -92,7 +90,7 @@ void BotNetworkManager::sendUpdateMembership(QString membershipId, bool isModera
     SendAndConnect(networkRequestHelper);
 }
 
-void BotNetworkManager::sendListMessages(QString roomId, QString mentionedPeople, QString before, QString beforeMessage, int max)
+void BotHttpClient::sendListMessages(QString roomId, QString mentionedPeople, QString before, QString beforeMessage, int max)
 {
     auto networkRequestHelper = BotNetworkRepquestHelper::New(RequestType::messages, SendType::Get);
     networkRequestHelper->setParams("roomId", roomId);
@@ -110,7 +108,7 @@ void BotNetworkManager::sendListMessages(QString roomId, QString mentionedPeople
     SendAndConnect(networkRequestHelper);
 }
 
-void BotNetworkManager::sendListDirectMessages(QString byString, bool isByEmail)
+void BotHttpClient::sendListDirectMessages(QString byString, bool isByEmail)
 {
     auto networkRequestHelper = BotNetworkRepquestHelper::New(RequestType::messages, SendType::Get);
     networkRequestHelper->setObjectId("direct");
@@ -122,7 +120,7 @@ void BotNetworkManager::sendListDirectMessages(QString byString, bool isByEmail)
     SendAndConnect(networkRequestHelper);
 }
 
-void BotNetworkManager::sendCreateMessage(const BotMessage &message)
+void BotHttpClient::sendCreateMessage(const BotMessage &message)
 {
     auto networkRequestHelper = BotNetworkRepquestHelper::New(RequestType::messages, SendType::Post);
 
@@ -202,7 +200,7 @@ void BotNetworkManager::sendCreateMessage(const BotMessage &message)
     SendAndConnect(networkRequestHelper);
 }
 
-void BotNetworkManager::sendListPeople(QString byString, int byWhat, int max)
+void BotHttpClient::sendListPeople(QString byString, int byWhat, int max)
 {
     auto networkRequestHelper = BotNetworkRepquestHelper::New(RequestType::people, SendType::Get);
     switch(byWhat){
@@ -225,7 +223,7 @@ void BotNetworkManager::sendListPeople(QString byString, int byWhat, int max)
     SendAndConnect(networkRequestHelper);
 }
 
-void BotNetworkManager::sendListRooms(QString type, QString sortBy, int max)
+void BotHttpClient::sendListRooms(QString type, QString sortBy, int max)
 {
     auto networkRequestHelper = BotNetworkRepquestHelper::New(RequestType::rooms, SendType::Get);
     if(type != ""){
@@ -240,7 +238,7 @@ void BotNetworkManager::sendListRooms(QString type, QString sortBy, int max)
     SendAndConnect(networkRequestHelper);
 }
 
-void BotNetworkManager::sendCreateRoom(QString title)
+void BotHttpClient::sendCreateRoom(QString title)
 {
     auto networkRequestHelper = BotNetworkRepquestHelper::New(RequestType::rooms, SendType::Post);
     networkRequestHelper->setContentType(BotNetworkRepquestHelper::contentType_Json);
@@ -252,7 +250,7 @@ void BotNetworkManager::sendCreateRoom(QString title)
     SendAndConnect(networkRequestHelper);
 }
 
-void BotNetworkManager::sendUpdateRoom(QString roomId, QString title)
+void BotHttpClient::sendUpdateRoom(QString roomId, QString title)
 {
     auto networkRequestHelper = BotNetworkRepquestHelper::New(RequestType::rooms, SendType::Put);
     networkRequestHelper->setContentType(BotNetworkRepquestHelper::contentType_Json);
@@ -265,7 +263,7 @@ void BotNetworkManager::sendUpdateRoom(QString roomId, QString title)
     SendAndConnect(networkRequestHelper);
 }
 
-void BotNetworkManager::sendListWebhooks(int max)
+void BotHttpClient::sendListWebhooks(int max)
 {
     auto networkRequestHelper = BotNetworkRepquestHelper::New(RequestType::webhooks, SendType::Get);
     networkRequestHelper->setParams("max", QString::number(max));
@@ -273,7 +271,7 @@ void BotNetworkManager::sendListWebhooks(int max)
     SendAndConnect(networkRequestHelper);
 }
 
-void BotNetworkManager::sendCreateWebhook(BotWebhook & webhook)
+void BotHttpClient::sendCreateWebhook(BotWebhook & webhook)
 {
     auto networkRequestHelper = BotNetworkRepquestHelper::New(RequestType::webhooks, SendType::Post);
     networkRequestHelper->setContentType(BotNetworkRepquestHelper::contentType_Json);
@@ -284,7 +282,7 @@ void BotNetworkManager::sendCreateWebhook(BotWebhook & webhook)
     SendAndConnect(networkRequestHelper);
 }
 
-void BotNetworkManager::sendUpdateWebhook(QString webhookId, QString name, QString targetUrl, QString status)
+void BotHttpClient::sendUpdateWebhook(QString webhookId, QString name, QString targetUrl, QString status)
 {
     auto networkRequestHelper = BotNetworkRepquestHelper::New(RequestType::webhooks, SendType::Put);
     networkRequestHelper->setContentType(BotNetworkRepquestHelper::contentType_Json);
@@ -298,7 +296,7 @@ void BotNetworkManager::sendUpdateWebhook(QString webhookId, QString name, QStri
     SendAndConnect(networkRequestHelper);
 }
 
-void BotNetworkManager::sendGetDetails(RequestType rt, QString id)
+void BotHttpClient::sendGetDetails(RequestType rt, QString id)
 {
     auto networkRequestHelper = BotNetworkRepquestHelper::New(rt, SendType::Get);
     networkRequestHelper->setObjectId(id);
@@ -306,7 +304,7 @@ void BotNetworkManager::sendGetDetails(RequestType rt, QString id)
     SendAndConnect(networkRequestHelper);
 }
 
-void BotNetworkManager::sendDelete(RequestType rt, QString id)
+void BotHttpClient::sendDelete(RequestType rt, QString id)
 {
     auto networkRequestHelper = BotNetworkRepquestHelper::New(rt, SendType::Delete);
     networkRequestHelper->setObjectId(id);
@@ -314,7 +312,7 @@ void BotNetworkManager::sendDelete(RequestType rt, QString id)
     SendAndConnect(networkRequestHelper);
 }
 
-void BotNetworkManager::on_GetNgrokInfo(BotNetworkReplyHelper *nrh)
+void BotHttpClient::on_GetNgrokInfo(BotNetworkReplyHelper *nrh)
 {
     BOTLOG("Receive message from ngrok");
     auto reply = nrh->GetNetworkReply();
@@ -324,24 +322,28 @@ void BotNetworkManager::on_GetNgrokInfo(BotNetworkReplyHelper *nrh)
         return;
     }
     std::shared_ptr<QByteArray> data(new QByteArray(reply->readAll()));
-    emit ngrokReady(data);
+    if(clientController){
+        clientController->ProcessingNgrokData(data);
+    }
     reply->deleteLater();
 }
 
-void BotNetworkManager::on_finished(BotNetworkReplyHelper *nrh)
+void BotHttpClient::on_finished(BotNetworkReplyHelper *nrh)
 {
     auto reply = nrh->GetNetworkReply();
     auto result = ParseReplyResult(reply);
     if (result == 200) {
         std::shared_ptr<QByteArray> data(new QByteArray(reply->readAll()));
-        emit dataReady(data, nrh->getRequestType());
+        if(clientController){
+            clientController->ProcessingTSData(data, nrh->getRequestType());
+        }
     }else if (result == 204) {
         emit readyWithoutData(nrh->getRequestType());
     }
     reply->deleteLater();
 }
 
-void BotNetworkManager::SendAndConnect(std::shared_ptr<BotNetworkRepquestHelper> requestHelper)
+void BotHttpClient::SendAndConnect(std::shared_ptr<BotNetworkRepquestHelper> requestHelper)
 {
     BOTLOG("Sending Begin!");
     QNetworkReply * reply = nullptr;
@@ -376,20 +378,20 @@ void BotNetworkManager::SendAndConnect(std::shared_ptr<BotNetworkRepquestHelper>
 
         BotNetworkReplyHelper * replyHelper = new BotNetworkReplyHelper(reply);
         replyHelper->setRequestType(requestHelper->getRequestType());
-        connect(replyHelper, &BotNetworkReplyHelper::finished, this, &BotNetworkManager::on_finished);
+        connect(replyHelper, &BotNetworkReplyHelper::finished, this, &BotHttpClient::on_finished);
     }else {
         BOTLOG("Sending failed!");
     }
 }
 
-int BotNetworkManager::ParseReplyResult(QNetworkReply *reply)
+int BotHttpClient::ParseReplyResult(QNetworkReply *reply)
 {
     auto errorCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     BOTLOG("Reply status:(" + QString::number(errorCode) + "):" << reply->error());
     if(errorCode < 200 || errorCode >= 300){
         QByteArray data = reply->readAll();
         QJsonObject * jsonObject = new QJsonObject;
-        if(ParseBytesToJson(data, jsonObject)){
+        if(ByteArrayToJson(data, jsonObject)){
             if(jsonObject->contains("message"))
                 BOTLOG(jsonObject->value("message"));
         }

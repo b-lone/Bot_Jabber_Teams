@@ -1,5 +1,5 @@
-#ifndef BOTSERVER_H
-#define BOTSERVER_H
+#ifndef BOTTCPSERVER_H
+#define BOTTCPSERVER_H
 
 #include <QObject>
 #include <memory>
@@ -9,6 +9,7 @@
 class QTcpServer;
 class QTcpSocket;
 class BotMessage;
+class BotTcpServerController;
 
 class BotTcpSocketHelper : public QObject
 {
@@ -30,19 +31,18 @@ private:
 };
 
 
-class BotServer : public QObject
+class BotTcpServer : public QObject
 {
     Q_OBJECT
 public:
-    static BotServer * Instance();
+    static BotTcpServer * Instance();
     bool Listen();
     void Close();
 
-private:
-    BotServer();
+    BotTcpServerController * getTcpServerController() { return serverController; }
 
-public slots:
-    void OnNewMessage(std::shared_ptr<BotMessage> message);
+private:
+    BotTcpServer();
 
 private slots:
     void on_newConnectionNgrok();
@@ -59,9 +59,11 @@ private:
     QVector<QString> messageIds;
 
     std::shared_ptr<QTcpServer> serverAutomation;
-     QList<QTcpSocket*> tcpClientAutomation;
+    QList<QTcpSocket*> tcpClientAutomation;
+
+    BotTcpServerController *serverController;
 };
 
-#define BOTSERVER BotServer::Instance()
+#define S_TCPSERVER BotTcpServer::Instance()
 
-#endif // BOTSERVER_H
+#endif // BOTTCPSERVER_H

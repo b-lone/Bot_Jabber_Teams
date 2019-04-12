@@ -4,7 +4,7 @@
 #include <QObject>
 
 #include <vector>
-#include <botnetworkmanager.h>
+#include <bothttpclient.h>
 
 class BotRoom;
 class BotPeople;
@@ -12,11 +12,14 @@ class BotMessage;
 class BotWebhook;
 class BotMembership;
 
-class BotNetworkController : public QObject
+class BotHttpClientController : public QObject
 {
     Q_OBJECT
 public:
-    explicit BotNetworkController(QObject *parent = nullptr);
+    explicit BotHttpClientController(QObject *parent = nullptr);
+
+    void ProcessingTSData(std::shared_ptr<QByteArray> data, RequestType requestType);
+    void ProcessingNgrokData(std::shared_ptr<QByteArray> data);
 
 signals:
     void roomReady(std::shared_ptr<BotRoom>);
@@ -32,10 +35,6 @@ signals:
     void membershipListReady(std::vector<std::shared_ptr<BotMembership>>);
 
     void ngrokUrlReady(QString);
-
-public slots:
-    void on_dataReady(std::shared_ptr<QByteArray> data, RequestType requestType);
-    void on_ngrokReady(std::shared_ptr<QByteArray> data);
     
 private:
     void RoomRoot(QJsonObject * jsonObject);

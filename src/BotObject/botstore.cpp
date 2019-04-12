@@ -6,8 +6,8 @@
 #include "botpeople.h"
 #include "botwebhook.h"
 #include "botcommon.h"
-#include "botnetworkmanager.h"
-#include "botnetworkcontroller.h"
+#include "bothttpclient.h"
+#include "bothttpclientcontroller.h"
 
 BotStore *BotStore::Instance()
 {
@@ -25,9 +25,9 @@ std::shared_ptr<BotWebhook> BotStore::getWebhookById(QString id)
 
 BotStore::BotStore(QObject *parent) : QObject(parent)
 {
-    auto networkController = BOTNETWORKMANAGER->getNetworkController();
-    connect(networkController, &BotNetworkController::webhookListReady, this, &BotStore::on_webhookListReady);
-    connect(networkController, &BotNetworkController::webhookReady, this, &BotStore::on_webhookReady);
+    auto networkController = S_HTTPCLIENT->getNetworkController();
+    connect(networkController, &BotHttpClientController::webhookListReady, this, &BotStore::on_webhookListReady);
+    connect(networkController, &BotHttpClientController::webhookReady, this, &BotStore::on_webhookReady);
 //    connect(networkController, &BotNetworkController::ngrokUrlReady, this, &BotStore::on_ngrokPublicUrlReady);
 }
 

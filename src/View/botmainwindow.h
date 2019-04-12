@@ -4,8 +4,9 @@
 #include <QMainWindow>
 #include <memory>
 class QProcess;
-class BotNetworkController;
+class BotHttpClientController;
 class BotProcessHelper;
+class BotWebhookPushController;
 
 namespace Ui {
 class BotMainWindow;
@@ -25,9 +26,12 @@ public slots:
 private slots:  
     void on_btnWebhookDialog_clicked();
 
+    void on_btnSetting_clicked();
+
 private:
     Ui::BotMainWindow *ui;
     BotProcessHelper *processHelper;
+    BotWebhookPushController *webhookPushController;
 };
 
 #endif // BOTMAINWINDOW_H

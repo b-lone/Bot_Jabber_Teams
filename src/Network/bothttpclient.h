@@ -1,5 +1,5 @@
-#ifndef BOTNETWORKMANAGER_H
-#define BOTNETWORKMANAGER_H
+#ifndef BOTHTTPCLIENT_H
+#define BOTHTTPCLIENT_H
 
 #include <QObject>
 #include <memory>
@@ -9,15 +9,15 @@ class QNetworkAccessManager;
 ;
 class BotWebhook;
 class BotMessage;
-class BotNetworkController;
+class BotHttpClientController;
 
-class BotNetworkManager : public QObject
+class BotHttpClient : public QObject
 {
     Q_OBJECT
 public:
-    static BotNetworkManager * Instance();
+    static BotHttpClient * Instance();
 
-    BotNetworkController * getNetworkController() { return networkController; }
+    BotHttpClientController * getNetworkController() { return clientController; }
 
     void sendGetNgrokInfo();
     //---------------Memberships----------------------------------
@@ -93,16 +93,14 @@ public:
     void sendDelete(RequestType rt, QString id);
 
 signals:
-    void dataReady(std::shared_ptr<QByteArray>, RequestType);
     void readyWithoutData(RequestType);
-    void ngrokReady(std::shared_ptr<QByteArray>);
 
 private slots:
     void on_GetNgrokInfo(BotNetworkReplyHelper * nrh);
     void on_finished(BotNetworkReplyHelper * nrh);
 
 private:
-    explicit BotNetworkManager();
+    explicit BotHttpClient();
 
     void SendAndConnect(std::shared_ptr<BotNetworkRepquestHelper> requestHelper);
 
@@ -111,9 +109,9 @@ private:
 
 private:
     std::shared_ptr<QNetworkAccessManager> networkAccessManager;
-    BotNetworkController *networkController;
+    BotHttpClientController *clientController;
 };
 
-#define BOTNETWORKMANAGER BotNetworkManager::Instance()
+#define S_HTTPCLIENT BotHttpClient::Instance()
 
-#endif // BOTNETWORKMANAGER_H
+#endif // BOTHTTPCLIENT_H

@@ -5,15 +5,15 @@
 #include <QByteArray>
 
 
-bool ParseBytesToJson(std::shared_ptr<QByteArray> bytes, QJsonObject *jsonObject)
+bool ByteArrayToJson(std::shared_ptr<QByteArray> bytes, QJsonObject *jsonObject)
 {
     if(!bytes)
         return false;
 
-    return ParseBytesToJson(*bytes, jsonObject);
+    return ByteArrayToJson(*bytes, jsonObject);
 }
 
-bool ParseBytesToJson(const QByteArray &bytes, QJsonObject *jsonObject)
+bool ByteArrayToJson(const QByteArray &bytes, QJsonObject *jsonObject)
 {
     QJsonParseError jsonError;
     QJsonDocument jsonDoc(QJsonDocument::fromJson(bytes, &jsonError));

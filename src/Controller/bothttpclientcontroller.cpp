@@ -1,4 +1,4 @@
-#include "botnetworkcontroller.h"
+#include "bothttpclientcontroller.h"
 
 #include <QJsonObject>
 #include <QJsonDocument>
@@ -10,17 +10,17 @@
 #include "botwebhook.h"
 #include "botpeople.h"
 
-BotNetworkController::BotNetworkController(QObject *parent) : QObject(parent)
+BotHttpClientController::BotHttpClientController(QObject *parent) : QObject(parent)
 {
 
 }
 
-void BotNetworkController::on_dataReady(std::shared_ptr<QByteArray> data, RequestType requestType)
+void BotHttpClientController::ProcessingTSData(std::shared_ptr<QByteArray> data, RequestType requestType)
 {
     BOTLOG("Recive http data.");
 
     QJsonObject * jsonObject = new QJsonObject;
-    if(ParseBytesToJson(data, jsonObject)){
+    if(ByteArrayToJson(data, jsonObject)){
         switch (requestType) {
         case RequestType::rooms:
             RoomRoot(jsonObject);
@@ -42,12 +42,12 @@ void BotNetworkController::on_dataReady(std::shared_ptr<QByteArray> data, Reques
     delete  jsonObject;
 }
 
-void BotNetworkController::on_ngrokReady(std::shared_ptr<QByteArray> data)
+void BotHttpClientController::ProcessingNgrokData(std::shared_ptr<QByteArray> data)
 {
     BOTLOG("Recive ngrok data.");
 
     QJsonObject * jsonObject = new QJsonObject;
-    if(ParseBytesToJson(data, jsonObject)){
+    if(ByteArrayToJson(data, jsonObject)){
         if(jsonObject->contains("tunnels")){
             QJsonArray subArray = jsonObject->value("tunnels").toArray();
             for (int i = 0; i< subArray.size(); i++) {
@@ -63,7 +63,7 @@ void BotNetworkController::on_ngrokReady(std::shared_ptr<QByteArray> data)
     }
 }
 
-void BotNetworkController::RoomRoot(QJsonObject *jsonObject)
+void BotHttpClientController::RoomRoot(QJsonObject *jsonObject)
 {
     if(jsonObject->contains("items")){
         Rooms(jsonObject);
@@ -72,7 +72,7 @@ void BotNetworkController::RoomRoot(QJsonObject *jsonObject)
     }
 }
 
-void BotNetworkController::PeopleRoot(QJsonObject *jsonObject)
+void BotHttpClientController::PeopleRoot(QJsonObject *jsonObject)
 {
     if(jsonObject->contains("items")){
         People(jsonObject);
@@ -81,7 +81,7 @@ void BotNetworkController::PeopleRoot(QJsonObject *jsonObject)
     }
 }
 
-void BotNetworkController::MessageRoot(QJsonObject *jsonObject)
+void BotHttpClientController::MessageRoot(QJsonObject *jsonObject)
 {
     if(jsonObject->contains("items")){
         Messages(jsonObject);
@@ -90,7 +90,7 @@ void BotNetworkController::MessageRoot(QJsonObject *jsonObject)
     }
 }
 
-void BotNetworkController::WebhookRoot(QJsonObject *jsonObject)
+void BotHttpClientController::WebhookRoot(QJsonObject *jsonObject)
 {
     if(jsonObject->contains("items")){
         Webhooks(jsonObject);
@@ -99,7 +99,7 @@ void BotNetworkController::WebhookRoot(QJsonObject *jsonObject)
     }
 }
 
-void BotNetworkController::MembershipRoot(QJsonObject *jsonObject)
+void BotHttpClientController::MembershipRoot(QJsonObject *jsonObject)
 {
     if(jsonObject->contains("items")){
         Memberships(jsonObject);
@@ -109,7 +109,7 @@ void BotNetworkController::MembershipRoot(QJsonObject *jsonObject)
 }
 
 template<class T>
-std::shared_ptr<T> BotNetworkController::GenerateObject(QJsonObject *jsonObject)
+std::shared_ptr<T> BotHttpClientController::GenerateObject(QJsonObject *jsonObject)
 {
     if(jsonObject){
         std::shared_ptr<T> object = T::New(jsonObject);
@@ -119,7 +119,7 @@ std::shared_ptr<T> BotNetworkController::GenerateObject(QJsonObject *jsonObject)
 }
 
 template<class T>
-std::vector<std::shared_ptr<T>> BotNetworkController::GenerateObjects(QJsonObject *jsonObject)
+std::vector<std::shared_ptr<T>> BotHttpClientController::GenerateObjects(QJsonObject *jsonObject)
 {
     std::vector<std::shared_ptr<T>> result;
     if(jsonObject){
@@ -134,7 +134,7 @@ std::vector<std::shared_ptr<T>> BotNetworkController::GenerateObjects(QJsonObjec
     return result;
 }
 
-void BotNetworkController::Rooms(QJsonObject *jsonObject)
+void BotHttpClientController::Rooms(QJsonObject *jsonObject)
 {
     BOTLOG("Rooms");
     if(jsonObject){
@@ -143,7 +143,7 @@ void BotNetworkController::Rooms(QJsonObject *jsonObject)
     }
 }
 
-void BotNetworkController::People(QJsonObject *jsonObject)
+void BotHttpClientController::People(QJsonObject *jsonObject)
 {
     BOTLOG("People");
     if(jsonObject){
@@ -152,7 +152,7 @@ void BotNetworkController::People(QJsonObject *jsonObject)
     }
 }
 
-void BotNetworkController::Messages(QJsonObject *jsonObject)
+void BotHttpClientController::Messages(QJsonObject *jsonObject)
 {
     BOTLOG("Messages");
     if(jsonObject){
@@ -161,7 +161,7 @@ void BotNetworkController::Messages(QJsonObject *jsonObject)
     }
 }
 
-void BotNetworkController::Webhooks(QJsonObject *jsonObject)
+void BotHttpClientController::Webhooks(QJsonObject *jsonObject)
 {
     BOTLOG("Webhooks");
     if(jsonObject){
@@ -170,7 +170,7 @@ void BotNetworkController::Webhooks(QJsonObject *jsonObject)
     }
 }
 
-void BotNetworkController::Memberships(QJsonObject *jsonObject)
+void BotHttpClientController::Memberships(QJsonObject *jsonObject)
 {
     BOTLOG("Memberships");
     if(jsonObject){
@@ -179,7 +179,7 @@ void BotNetworkController::Memberships(QJsonObject *jsonObject)
     }
 }
 
-void BotNetworkController::Room(QJsonObject *jsonObject)
+void BotHttpClientController::Room(QJsonObject *jsonObject)
 {
     BOTLOG("Room");
     if(jsonObject){
@@ -188,7 +188,7 @@ void BotNetworkController::Room(QJsonObject *jsonObject)
     }
 }
 
-void BotNetworkController::Person(QJsonObject *jsonObject)
+void BotHttpClientController::Person(QJsonObject *jsonObject)
 {
     BOTLOG("Person");
     if(jsonObject){
@@ -197,7 +197,7 @@ void BotNetworkController::Person(QJsonObject *jsonObject)
     }
 }
 
-void BotNetworkController::Message(QJsonObject *jsonObject)
+void BotHttpClientController::Message(QJsonObject *jsonObject)
 {
     BOTLOG("Message");
     if(jsonObject){
@@ -206,7 +206,7 @@ void BotNetworkController::Message(QJsonObject *jsonObject)
     }
 }
 
-void BotNetworkController::Webhook(QJsonObject *jsonObject)
+void BotHttpClientController::Webhook(QJsonObject *jsonObject)
 {
     BOTLOG("Webhook");
     if(jsonObject){
@@ -215,7 +215,7 @@ void BotNetworkController::Webhook(QJsonObject *jsonObject)
     }
 }
 
-void BotNetworkController::Membership(QJsonObject *jsonObject)
+void BotHttpClientController::Membership(QJsonObject *jsonObject)
 {
     BOTLOG("Membership");
     if(jsonObject){

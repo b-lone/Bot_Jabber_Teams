@@ -41,7 +41,7 @@ BotNetworkRepquestHelper::BotNetworkRepquestHelper(RequestType rt, SendType st):
 {
     this->request = std::make_shared<QNetworkRequest>();
 
-    auto botAccessToken = BOTCONFIG->Value(BotConfig::BotAccessToken).toByteArray();
+    auto botAccessToken = S_CONFIG->Value(BotConfig::BotAccessToken).toByteArray();
     request->setRawHeader("Authorization", botAccessToken);
 }
 

@@ -52,6 +52,6 @@ private:
 //    QString ngrokUrl;
 };
 
-#define BOTSTORE BotStore::Instance()
+#define S_STORE BotStore::Instance()
 
 #endif // BOTSTORE_H

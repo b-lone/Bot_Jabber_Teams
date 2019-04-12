@@ -4,26 +4,30 @@
 #include <QMessageBox>
 #include <QThread>
 
-#include "botnetworkmanager.h"
+#include "bothttpclient.h"
 #include "botconfig.h"
-#include "botserver.h"
+#include "bottcpserver.h"
 #include "botwebhook.h"
 #include "botmessage.h"
 #include "botcommon.h"
-#include "botnetworkcontroller.h"
+#include "bothttpclientcontroller.h"
 #include "botprocesshelper.h"
 #include "botwebhooksdialog.h"
+#include "botwebhookpushcontroller.h"
+#include "botlocalsetting.h"
 
 BotMainWindow::BotMainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::BotMainWindow)
 {
     ui->setupUi(this);
-    BOTSERVER->Listen();
+    S_TCPSERVER->Listen();
 
     processHelper = new BotProcessHelper(this);
     connect(processHelper, &BotProcessHelper::errorOccurred, this, &BotMainWindow::showMessages);
     processHelper->RunNgrok();
+
+    webhookPushController = new BotWebhookPushController(this);
 }
 
 BotMainWindow::~BotMainWindow()
@@ -46,6 +50,12 @@ void BotMainWindow::on_btnWebhookDialog_clicked()
     dlg->show();
 }
 
+void BotMainWindow::on_btnSetting_clicked()
+{
+    BotLocalSetting *dlg = new BotLocalSetting(this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->show();
+}
 //void BotMainWindow::on_btnRooms_clicked()
 //{
 //    BOTNETWORKMANAGER->sendListRooms();
@@ -195,4 +205,6 @@ void BotMainWindow::on_btnWebhookDialog_clicked()
 //{
 //    BOTNETWORKMANAGER->sendGetNgrokInfo();
 //}
+
+
 

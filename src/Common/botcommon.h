@@ -6,9 +6,12 @@
 
 #define BOTLOG(arg) qDebug() << "[" << __FILE__ << "][" << __LINE__ << "][" << __func__ << "]:" << arg
 
+#define ParseJsonToString(key) key = jsonObject->value(#key).toString()
+#define ParseJsonToObject(key) QJsonObject key##Object = jsonObject->value(#key).toObject()
+
 class QJsonObject;
 class QByteArray;
-bool ParseBytesToJson(std::shared_ptr<QByteArray> bytes, QJsonObject * jsonObject);
-bool ParseBytesToJson(const QByteArray & bytes, QJsonObject * jsonObject);
+bool ByteArrayToJson(std::shared_ptr<QByteArray> bytes, QJsonObject * jsonObject);
+bool ByteArrayToJson(const QByteArray & bytes, QJsonObject * jsonObject);
 
 #endif // BOTCOMMON_H

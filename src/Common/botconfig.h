@@ -26,6 +26,6 @@ private:
     std::shared_ptr<QSettings> settings;
 };
 
-#define BOTCONFIG BotConfig::Instance()
+#define S_CONFIG BotConfig::Instance()
 
 #endif // BOTCONFIG_H

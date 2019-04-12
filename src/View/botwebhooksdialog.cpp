@@ -5,8 +5,8 @@
 
 #include "botstore.h"
 #include "botwebhook.h"
-#include "botnetworkmanager.h"
-#include "botnetworkcontroller.h"
+#include "bothttpclient.h"
+#include "bothttpclientcontroller.h"
 #include "botcommon.h"
 
 static int columnId = 0;
@@ -25,10 +25,10 @@ BotWebhooksDialog::BotWebhooksDialog(QWidget *parent) :
     on_tableWebhooks_itemSelectionChanged();
     ui->btnCreate->setEnabled(false);
 
-    connect(BOTSTORE, &BotStore::webhookReady, this, &BotWebhooksDialog::UpdateTable);
-    connect(BOTNETWORKMANAGER, &BotNetworkManager::readyWithoutData, this, &BotWebhooksDialog::on_deleteFinshed);
-    auto networkController = BOTNETWORKMANAGER->getNetworkController();
-    connect(networkController, &BotNetworkController::ngrokUrlReady, this, &BotWebhooksDialog::update_leUrl);
+    connect(S_STORE, &BotStore::webhookReady, this, &BotWebhooksDialog::UpdateTable);
+    connect(S_HTTPCLIENT, &BotHttpClient::readyWithoutData, this, &BotWebhooksDialog::on_deleteFinshed);
+    auto networkController = S_HTTPCLIENT->getNetworkController();
+    connect(networkController, &BotHttpClientController::ngrokUrlReady, this, &BotWebhooksDialog::update_leUrl);
 }
 
 BotWebhooksDialog::~BotWebhooksDialog()
@@ -44,7 +44,7 @@ void BotWebhooksDialog::UpdateTable()
 
     table->setRowCount(0);
 
-    auto webhooks = BOTSTORE->getWebhooks();
+    auto webhooks = S_STORE->getWebhooks();
     for (auto webhook : webhooks) {
         table->insertRow(0);
         table->setItem(0, columnId, new QTableWidgetItem(webhook->id));
@@ -58,7 +58,7 @@ void BotWebhooksDialog::UpdateTable()
 void BotWebhooksDialog::on_btnRefresh_clicked()
 {
     BOTLOG("Refresh Webhooks");
-    BOTNETWORKMANAGER->sendListWebhooks();
+    S_HTTPCLIENT->sendListWebhooks();
 }
 
 void BotWebhooksDialog::on_btnActive_clicked()
@@ -66,9 +66,9 @@ void BotWebhooksDialog::on_btnActive_clicked()
     BOTLOG("Active webhook");
     auto selectedRows = ui->tableWebhooks->selectionModel()->selectedRows();
     auto id = ui->tableWebhooks->item(selectedRows[0].row(), columnStatus)->text();
-    auto webhookptr = BOTSTORE->getWebhookById(id);
+    auto webhookptr = S_STORE->getWebhookById(id);
     if(webhookptr){
-        BOTNETWORKMANAGER->sendUpdateWebhook(id, webhookptr->name, webhookptr->targetUrl);
+        S_HTTPCLIENT->sendUpdateWebhook(id, webhookptr->name, webhookptr->targetUrl);
     }
 }
 
@@ -78,7 +78,7 @@ void BotWebhooksDialog::on_btnDelete_clicked()
     auto selectedRows = ui->tableWebhooks->selectionModel()->selectedRows();
     auto id = ui->tableWebhooks->item(selectedRows[0].row(), columnId)->text();
     BOTLOG(id);
-    BOTNETWORKMANAGER->sendDelete(RequestType::webhooks, id);
+    S_HTTPCLIENT->sendDelete(RequestType::webhooks, id);
 }
 
 void BotWebhooksDialog::on_btnCreate_clicked()
@@ -90,13 +90,13 @@ void BotWebhooksDialog::on_btnCreate_clicked()
     object.resource = ui->cbResource->currentText();
     object.event = ui->cbEvent->currentText();
     BOTLOG(object);
-    BOTNETWORKMANAGER->sendCreateWebhook(object);
+    S_HTTPCLIENT->sendCreateWebhook(object);
 }
 
 void BotWebhooksDialog::on_btnGetUrl_clicked()
 {
     BOTLOG("on_btnGetUrl_clicked");
-    BOTNETWORKMANAGER->sendGetNgrokInfo();
+    S_HTTPCLIENT->sendGetNgrokInfo();
 }
 
 void BotWebhooksDialog::on_tableWebhooks_itemSelectionChanged()
@@ -138,5 +138,5 @@ void BotWebhooksDialog::on_deleteFinshed(RequestType type)
         return;
     }
     BOTLOG("on_deleteFinshed");
-    BOTNETWORKMANAGER->sendListWebhooks();
+    S_HTTPCLIENT->sendListWebhooks();
 }

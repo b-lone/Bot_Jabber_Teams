@@ -42,7 +42,7 @@ void BotProcessHelper::RunNgrok()
 
     QStringList args;
     args << "http";
-    args << BOTCONFIG->Value(BotConfig::ngrokPort).toString();
+    args << S_CONFIG->Value(BotConfig::ngrokPort).toString();
     BOTLOG("ngrok parameters:" << args);
 
     process->start(ngrokPath, args);
