@@ -15,6 +15,7 @@
 #include "botprocesshelper.h"
 #include "botwebhooksdialog.h"
 #include "botwebhookpushcontroller.h"
+#include "botcommandcontroller.h"
 #include "botlocalsetting.h"
 
 BotMainWindow::BotMainWindow(QWidget *parent) :
@@ -29,6 +30,7 @@ BotMainWindow::BotMainWindow(QWidget *parent) :
     processHelper->RunNgrok();
 
     webhookPushController = new BotWebhookPushController(this);
+    commandController = new BotCommandController(this);
 }
 
 BotMainWindow::~BotMainWindow()

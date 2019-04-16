@@ -5,10 +5,7 @@
 #include <memory>
 
 class BotWebhookPush;
-class BotObject;
-typedef struct {
-    std::shared_ptr<BotObject> object;
-}Command;
+class BotCommand;
 
 class BotTcpServerController : public QObject
 {
@@ -20,8 +17,8 @@ public:
     void ProcessingAutomationData(std::shared_ptr<QByteArray> data);
 
 signals:
-    void webhookPushReady(std::shared_ptr<BotWebhookPush> object);
-    void automationCommandReady();
+    void webhookPushReady(std::shared_ptr<BotWebhookPush>);
+    void commandReady(std::shared_ptr<BotCommand>);
 };
 
 #endif // BOTSERVERCONTROLLER_H

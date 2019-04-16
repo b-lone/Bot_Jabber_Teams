@@ -15,9 +15,6 @@ class BotWebhookPushController : public QObject
 public:
     explicit BotWebhookPushController(QObject *parent = nullptr);
 
-signals:
-    void messageDetailsReady();
-
 public slots:
     void on_webhookPushReady(std::shared_ptr<BotWebhookPush> object);
     void on_messageReady(std::shared_ptr<BotMessage> object);

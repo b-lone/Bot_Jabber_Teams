@@ -123,6 +123,9 @@ void BotTcpServer::on_readyReadNgrok()
 
     for (int i = 0; i < tcpClientNgrok.count(); ++i) {
         std::shared_ptr<QByteArray> data(new QByteArray(tcpClientNgrok[i]->readAll()));
+        if(data->isEmpty()){
+            continue;
+        }
         serverController->ProcessingNgrokData(data);
     }
 }
@@ -156,9 +159,10 @@ void BotTcpServer::on_readyReadAutomation()
     BOTLOG("New Automation Message.");
 
     for (int i = 0; i < tcpClientAutomation.count(); ++i) {
-        QByteArray buffer = tcpClientAutomation[i]->readAll();
-        if(buffer.isEmpty())
+        std::shared_ptr<QByteArray> data(new QByteArray(tcpClientAutomation[i]->readAll()));
+        if(data->isEmpty())
             continue;
+        serverController->ProcessingAutomationData(data);
     }
 }
 

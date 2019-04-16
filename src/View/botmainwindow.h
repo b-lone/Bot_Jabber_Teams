@@ -7,6 +7,7 @@ class QProcess;
 class BotHttpClientController;
 class BotProcessHelper;
 class BotWebhookPushController;
+class BotCommandController;
 
 namespace Ui {
 class BotMainWindow;
@@ -33,6 +34,7 @@ private:
     Ui::BotMainWindow *ui;
     BotProcessHelper *processHelper;
     BotWebhookPushController *webhookPushController;
+    BotCommandController *commandController;
 };
 
 #endif // BOTMAINWINDOW_H
