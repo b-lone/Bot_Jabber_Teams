@@ -8,6 +8,7 @@
 #include "botwebhookpush.h"
 #include "botmessage.h"
 #include "botconfig.h"
+#include "botpingcontroller.h"
 
 BotWebhookPushController::BotWebhookPushController(QObject *parent) : QObject(parent)
 {
@@ -35,9 +36,41 @@ void BotWebhookPushController::on_webhookPushReady(std::shared_ptr<BotWebhookPus
 void BotWebhookPushController::on_messageReady(std::shared_ptr<BotMessage> object)
 {
     BOTLOG("on_messageReady");
-    if(CheckExistAndRemove(object->id, "created")){
+    if(!CheckExistAndRemove(object->id, "created")){
+        return;
+    }
+    auto text = object->text;
+    if(object->roomType == "group"){
+        auto displayName = S_CONFIG->Value(BotConfig::BotDisplayName).toString();
+        text = text.mid(displayName.count());
+    }
+
+    if(text[0] == "\\" || text.mid(0,2) == " \\"){
+        text.remove(' ');
+        if(text == "\\p"){
+            BotMessage msgForSend;
+            msgForSend.roomId = object->roomId;
+            msgForSend.files.push_back("picture/hello.png");
+            S_HTTPCLIENT->sendCreateMessage(msgForSend);
+        }else if (text.mid(0, 5) == "\\ping") {
+            std::shared_ptr<BotPingController> pc(new BotPingController);
+            pc->Init(object);
+            auto timeInterval = text.mid(5).toInt();
+            BOTLOG("timeInterval" << timeInterval);
+            pingControllers.push_back(pc);
+            pc->StartPing(timeInterval);
+        }else if (text.mid(0, 5) == "\\stop") {
+            pingControllers.erase(std::remove_if(pingControllers.begin(),
+                                                 pingControllers.end(),
+                                                 [&](std::shared_ptr<BotPingController> pc){ return pc->getRoomId() == object->roomId; }));
+        }
+    }else {
+        BotMessage msgForSend;
+        msgForSend.roomId = object->roomId;
+        msgForSend.text = text;
         S_HTTPCLIENT->sendCreateMessage(*object);
     }
+
 }
 
 bool BotWebhookPushController::CheckExist(std::shared_ptr<BotWebhookPush> object)
@@ -83,29 +116,3 @@ bool BotWebhookPushController::CheckExistAndRemove(QString id, QString event)
         return true;
     }
 }
-
-//void BotTcpServer::OnNewMessage(std::shared_ptr<BotMessage> message)
-//{
-//    BOTLOG("New Message");
-//    for (int i = 0; i< messageIds.length(); ++i) {
-//        if(messageIds[i] == message->id){
-//            BotMessage msgForSend;
-//            msgForSend.roomId = message->roomId;
-
-//            auto text = message->text;
-//            if(message->roomType == "group"){
-//                auto displayName = BOTCONFIG->Value(BotConfig::BotDisplayName).toString();
-//                text = message->text.mid(displayName.count());
-//            }
-//            if(text.contains("picture")){// remove(' ') == "sendmepicture"){
-//                msgForSend.files.push_back("picture/hello.png");
-//            }else {
-//                msgForSend.text = text;
-//            }
-
-
-//            S_HTTPCLIENT->sendCreateMessage(msgForSend);
-//            messageIds.removeAll(message->id);
-//        }
-//    }
-//}

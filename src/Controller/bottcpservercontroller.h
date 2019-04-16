@@ -5,6 +5,10 @@
 #include <memory>
 
 class BotWebhookPush;
+class BotObject;
+typedef struct {
+    std::shared_ptr<BotObject> object;
+}Command;
 
 class BotTcpServerController : public QObject
 {
@@ -13,11 +17,11 @@ public:
     explicit BotTcpServerController(QObject *parent = nullptr);
 
     void ProcessingNgrokData(std::shared_ptr<QByteArray> data);
+    void ProcessingAutomationData(std::shared_ptr<QByteArray> data);
 
 signals:
     void webhookPushReady(std::shared_ptr<BotWebhookPush> object);
-
-public slots:
+    void automationCommandReady();
 };
 
 #endif // BOTSERVERCONTROLLER_H

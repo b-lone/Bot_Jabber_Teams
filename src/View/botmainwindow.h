@@ -22,6 +22,7 @@ public:
 
 public slots:
    void showMessages(QString msg);
+   void reboot();
 
 private slots:  
     void on_btnWebhookDialog_clicked();

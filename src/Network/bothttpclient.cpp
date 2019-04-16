@@ -145,6 +145,7 @@ void BotHttpClient::sendCreateMessage(const BotMessage &message)
         multiPart->append(toPersonEmailPart);
     }else {
         BOTLOG("No destination!");
+        delete multiPart;
         return;
     }
 

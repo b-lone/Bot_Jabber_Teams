@@ -7,6 +7,7 @@
 #include <bothttpclient.h>
 
 class BotWebhookPush;
+class BotPingController;
 
 class BotWebhookPushController : public QObject
 {
@@ -30,6 +31,7 @@ private:
 
 private:
     std::vector<std::shared_ptr<BotWebhookPush>> webhookPushStore;
+    std::vector<std::shared_ptr<BotPingController>> pingControllers;
 };
 
 #endif // BOTWEBHOOKPUSHCONTROLLER_H

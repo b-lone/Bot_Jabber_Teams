@@ -15,6 +15,9 @@ public:
     explicit BotLocalSetting(QWidget *parent = nullptr);
     ~BotLocalSetting();
 
+signals:
+    void needReboot();
+
 private slots:
     void on_btnReset_clicked();
     void on_btnOK_clicked();

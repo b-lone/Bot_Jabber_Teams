@@ -16,7 +16,7 @@ public:
     static const QString BotId;
     static const QString BotDisplayName;
     static const QString ngrokPort;
-    static const QString ngrokSubdomain;
+//    static const QString ngrokSubdomain;
     static const QString automationPort;
 
     QVariant Value(const QString & key);

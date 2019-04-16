@@ -3,6 +3,7 @@
 #include <QProcess>
 #include <QMessageBox>
 #include <QThread>
+#include <QDir>
 
 #include "bothttpclient.h"
 #include "botconfig.h"
@@ -32,6 +33,7 @@ BotMainWindow::BotMainWindow(QWidget *parent) :
 
 BotMainWindow::~BotMainWindow()
 {
+    S_TCPSERVER->Close();
     delete ui;
 }
 
@@ -41,6 +43,15 @@ void BotMainWindow::showMessages(QString msg)
     msgBox->setText(msg);
     msgBox->setModal(true);
     msgBox->show();
+}
+
+void BotMainWindow::reboot()
+{
+    QString program = QApplication::applicationFilePath();
+    QStringList arguments = QApplication::arguments();
+    QString workingDirectory = QDir::currentPath();
+    QProcess::startDetached(program, arguments, workingDirectory);
+    QApplication::exit();
 }
 
 void BotMainWindow::on_btnWebhookDialog_clicked()
@@ -53,6 +64,7 @@ void BotMainWindow::on_btnWebhookDialog_clicked()
 void BotMainWindow::on_btnSetting_clicked()
 {
     BotLocalSetting *dlg = new BotLocalSetting(this);
+    connect(dlg, &BotLocalSetting::needReboot, this, &BotMainWindow::reboot);
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     dlg->show();
 }

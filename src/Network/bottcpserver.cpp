@@ -63,13 +63,14 @@ bool BotTcpServer::Listen()
 
 void BotTcpServer::Close()
 {
+    BOTLOG("Close");
     {
         for(auto client: tcpClientNgrok)
         {
             client->disconnectFromHost();
             if(!client->waitForDisconnected(1000))
             {
-                //处理异常
+                BOTLOG("Ngrok disconnect failed!");
             }
         }
         tcpClientNgrok.clear();
@@ -81,7 +82,7 @@ void BotTcpServer::Close()
             client->disconnectFromHost();
             if(!client->waitForDisconnected(1000))
             {
-                //处理异常
+                BOTLOG("Automation disconnect failed!");
             }
         }
         tcpClientAutomation.clear();
